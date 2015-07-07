@@ -36,14 +36,17 @@ public class ApiRequest {
     Logger logger = LoggerFactory.getLogger(ApiRequest.class);
 
     private String url;
+    private ApiMethod method;
 
-    private ApiRequest(String url) {
+    private ApiRequest(ApiMethod method, String url) {
+        this.method = method;
         this.url = url;
     }
 
     public ApiResponse execute() {
         try {
-            HttpResponse response = Request.Get(url).execute().returnResponse();
+            HttpResponse response = request().execute().returnResponse();
+
             StringWriter writer = new StringWriter();
             IOUtils.copy(response.getEntity().getContent(), writer);
             String theString = writer.toString();
@@ -57,8 +60,20 @@ public class ApiRequest {
         }
     }
 
+    private Request request() {
+        switch (method) {
+            case GET:
+                return Request.Get(url);
+            case POST:
+                return Request.Post(url);
+            default:
+                throw new RuntimeException("Unimplemented ApiRequest type");
+        }
+    }
+
     public static class Builder {
         private String url;
+        private ApiMethod method;
 
         Builder url(String url) {
             this.url = url;
@@ -66,7 +81,12 @@ public class ApiRequest {
         }
 
         ApiRequest build() {
-            return new ApiRequest(url);
+            return new ApiRequest(method, url);
+        }
+
+        public Builder method(ApiMethod method) {
+            this.method = method;
+            return this;
         }
     }
 }

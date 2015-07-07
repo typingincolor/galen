@@ -1,14 +1,5 @@
 package info.losd.galen.client;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -32,20 +23,6 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class TestDefaultApiClient {
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule();
-
-    @Test
-    public void test_it_can_make_a_request() {
-        wireMockRule.stubFor(get(urlEqualTo("/test"))
-                .willReturn(aResponse().withBody("Test")));
-
-        ApiRequest request = new ApiRequest.Builder().url("http://localhost:8080/test").build();
-
-        ApiResponse result = request.execute();
-
-        assertThat("status code", result.getStatusCode(), is(200));
-        assertThat("body", result.getBody(), is(equalTo("Test")));
-    }
+public enum ApiMethod {
+    GET, POST
 }
