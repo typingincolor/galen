@@ -45,7 +45,6 @@ public class TestDefaultApiClient {
         ApiResponse result = client.execute("http://localhost:8080/test");
 
         assertThat("status code", result.getStatusCode(), is(200));
-        System.out.println(result.getBody());
         assertThat("body", result.getBody(), is(equalTo("Test")));
     }
 }
