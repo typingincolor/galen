@@ -7,6 +7,7 @@ import org.junit.Test;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsEqual.equalTo;
 
 /**
  * The MIT License (MIT)
@@ -41,8 +42,10 @@ public class TestDefaultApiClient {
                 .willReturn(aResponse().withBody("Test")));
 
         ApiClient client = new DefaultApiClient();
-        int status = client.execute("http://localhost:8080/test");
+        ApiResponse result = client.execute("http://localhost:8080/test");
 
-        assertThat("status code", status, is(200));
+        assertThat("status code", result.getStatusCode(), is(200));
+        System.out.println(result.getBody());
+        assertThat("body", result.getBody(), is(equalTo("Test")));
     }
 }

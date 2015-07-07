@@ -1,10 +1,13 @@
 package info.losd.galen.client;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.StringWriter;
 
 /**
  * The MIT License (MIT)
@@ -33,9 +36,16 @@ public class DefaultApiClient implements ApiClient {
     Logger logger = LoggerFactory.getLogger(DefaultApiClient.class);
 
     @Override
-    public int execute(String url) {
+    public ApiResponse execute(String url) {
         try {
-            return Request.Get(url).execute().returnResponse().getStatusLine().getStatusCode();
+            HttpResponse response = Request.Get(url).execute().returnResponse();
+            StringWriter writer = new StringWriter();
+            IOUtils.copy(response.getEntity().getContent(), writer);
+            String theString = writer.toString();
+
+            return new ApiResponse.Builder()
+                    .statusCode(response.getStatusLine().getStatusCode())
+                    .body(theString).build();
         } catch (IOException e) {
             logger.error("IO Exception", e);
             throw new RuntimeException(e);

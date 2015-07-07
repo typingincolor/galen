@@ -23,6 +23,39 @@ package info.losd.galen.client;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-interface ApiClient {
-    ApiResponse execute(String url);
+public class ApiResponse {
+    private int statusCode;
+    private String body;
+
+    public String getBody() {
+        return body;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    private ApiResponse(int statusCode, String body) {
+        this.statusCode = statusCode;
+        this.body = body;
+    }
+
+    public static class Builder {
+        int statusCode;
+        String body;
+
+        public ApiResponse build() {
+            return new ApiResponse(statusCode, body);
+        }
+
+        public Builder statusCode(int statusCode) {
+            this.statusCode = statusCode;
+            return this;
+        }
+
+        public Builder body(String body) {
+            this.body = body;
+            return this;
+        }
+    }
 }
