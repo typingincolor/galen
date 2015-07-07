@@ -16,3 +16,10 @@ dependencies {
     testCompile 'com.github.tomakehurst:wiremock:1.56'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
 }
+
+test {
+    reports {
+        junitXml.enabled = false
+        html.enabled = true
+    }
+}
