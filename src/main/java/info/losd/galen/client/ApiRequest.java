@@ -32,11 +32,16 @@ import java.io.StringWriter;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class DefaultApiClient implements ApiClient {
-    Logger logger = LoggerFactory.getLogger(DefaultApiClient.class);
+public class ApiRequest {
+    Logger logger = LoggerFactory.getLogger(ApiRequest.class);
 
-    @Override
-    public ApiResponse execute(String url) {
+    private String url;
+
+    private ApiRequest(String url) {
+        this.url = url;
+    }
+
+    public ApiResponse execute() {
         try {
             HttpResponse response = Request.Get(url).execute().returnResponse();
             StringWriter writer = new StringWriter();
@@ -49,6 +54,19 @@ public class DefaultApiClient implements ApiClient {
         } catch (IOException e) {
             logger.error("IO Exception", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    public static class Builder {
+        private String url;
+
+        Builder url(String url) {
+            this.url = url;
+            return this;
+        }
+
+        ApiRequest build() {
+            return new ApiRequest(url);
         }
     }
 }

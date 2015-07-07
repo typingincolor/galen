@@ -41,8 +41,9 @@ public class TestDefaultApiClient {
         wireMockRule.stubFor(get(urlEqualTo("/test"))
                 .willReturn(aResponse().withBody("Test")));
 
-        ApiClient client = new DefaultApiClient();
-        ApiResponse result = client.execute("http://localhost:8080/test");
+        ApiRequest request = new ApiRequest.Builder().url("http://localhost:8080/test").build();
+
+        ApiResponse result = request.execute();
 
         assertThat("status code", result.getStatusCode(), is(200));
         assertThat("body", result.getBody(), is(equalTo("Test")));
