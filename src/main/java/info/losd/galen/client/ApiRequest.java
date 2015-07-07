@@ -47,17 +47,19 @@ public class ApiRequest {
         try {
             HttpResponse response = request().execute().returnResponse();
 
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(response.getEntity().getContent(), writer);
-            String theString = writer.toString();
-
             return new ApiResponse.Builder()
                     .statusCode(response.getStatusLine().getStatusCode())
-                    .body(theString).build();
+                    .body(getResponseBody(response)).build();
         } catch (IOException e) {
             logger.error("IO Exception", e);
             throw new RuntimeException(e);
         }
+    }
+
+    private String getResponseBody(HttpResponse response) throws IOException {
+        StringWriter writer = new StringWriter();
+        IOUtils.copy(response.getEntity().getContent(), writer);
+        return writer.toString();
     }
 
     private Request request() {
