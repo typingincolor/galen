@@ -1,6 +1,5 @@
 package info.losd.galen.client;
 
-import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -8,12 +7,10 @@ import org.apache.http.client.fluent.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The MIT License (MIT)
@@ -38,51 +35,48 @@ import java.util.Map;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class ApiRequest {
-    private String url;
-    private ApiMethod method;
-    private Map<String, String> headers;
+@Service
+public class ApiClient {
+    Logger logger = LoggerFactory.getLogger(ApiClient.class);
 
-    private ApiRequest(ApiMethod method, String url, Map<String, String> headers) {
-        this.method = method;
-        this.url = url;
-        this.headers = headers;
-    }
+    @Autowired
+    StatsDClient statsd;
 
-    public String getUrl() {
-        return url;
-    }
+    public ApiResponse execute(ApiRequest req) {
+        try {
+            Request request = request(req);
 
-    public ApiMethod getMethod() {
-        return method;
-    }
+            req.getHeaders().forEach((header, value) -> request.addHeader(header, value));
 
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
+            long start = System.nanoTime();
+            HttpResponse response = request.execute().returnResponse();
+            long end = System.nanoTime();
 
-    public static class Builder {
-        private String url;
-        private ApiMethod method;
-        private Map<String, String> headers = new HashMap<>();
+            statsd.recordExecutionTime("apitime", (end - start) / 1000000);
 
-        public Builder url(String url) {
-            this.url = url;
-            return this;
+            return new ApiResponse.Builder()
+                    .statusCode(response.getStatusLine().getStatusCode())
+                    .body(getResponseBody(response)).build();
+        } catch (IOException e) {
+            logger.error("IO Exception", e);
+            throw new RuntimeException(e);
         }
+    }
 
-        public ApiRequest build() {
-            return new ApiRequest(method, url, headers);
-        }
+    private String getResponseBody(HttpResponse response) throws IOException {
+        StringWriter writer = new StringWriter();
+        IOUtils.copy(response.getEntity().getContent(), writer);
+        return writer.toString();
+    }
 
-        public Builder method(ApiMethod method) {
-            this.method = method;
-            return this;
-        }
-
-        public Builder header(String header, String value) {
-            headers.put(header, value);
-            return this;
+    private Request request(ApiRequest req) {
+        switch (req.getMethod()) {
+            case GET:
+                return Request.Get(req.getUrl());
+            case POST:
+                return Request.Post(req.getUrl());
+            default:
+                throw new RuntimeException("Unimplemented ApiRequest type");
         }
     }
 }

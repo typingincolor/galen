@@ -2,3 +2,5 @@
 .gradle
 galen.iml
 build
+.env
+

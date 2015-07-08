@@ -1,10 +1,12 @@
 package info.losd.galen.api;
 
+import info.losd.galen.client.ApiClient;
 import info.losd.galen.client.ApiMethod;
 import info.losd.galen.client.ApiRequest;
 import info.losd.galen.client.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -36,11 +38,14 @@ import org.springframework.web.bind.annotation.*;
 public class GalenApiController {
     Logger logger = LoggerFactory.getLogger(GalenApiController.class);
 
+    @Autowired
+    ApiClient client;
+
     @RequestMapping(value = "/run", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     GalenResult run(@RequestBody GalenRequest galen) {
         ApiRequest.Builder apiRequestBuilder  = new ApiRequest.Builder().url(galen.getUrl()).method(ApiMethod.valueOf(galen.getMethod()));
         galen.getHeaders().forEach((header, value) -> apiRequestBuilder.header(header, value));
-        ApiResponse response = apiRequestBuilder.build().execute();
+        ApiResponse response = client.execute(apiRequestBuilder.build());
 
         return new GalenResult.Builder().status(response.getStatusCode()).build();
     }

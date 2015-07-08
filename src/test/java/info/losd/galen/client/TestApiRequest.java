@@ -2,13 +2,27 @@ package info.losd.galen.client;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.timgroup.statsd.StatsDClient;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.longThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * The MIT License (MIT)
@@ -37,6 +51,17 @@ public class TestApiRequest {
     @Rule
     public WireMockRule wireMockRule = new WireMockRule();
 
+    @Mock
+    private StatsDClient statsd;
+
+    @InjectMocks
+    ApiClient client;
+
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+    }
+
     @Test
     public void test_it_can_make_a_get_request() {
         stubFor(get(urlEqualTo("/test"))
@@ -44,7 +69,7 @@ public class TestApiRequest {
 
         ApiRequest request = new ApiRequest.Builder().method(ApiMethod.GET).url("http://localhost:8080/test").build();
 
-        ApiResponse result = request.execute();
+        ApiResponse result = client.execute(request);
 
         assertThat("status code", result.getStatusCode(), is(200));
         assertThat("body", result.getBody(), is(equalTo("Test")));
@@ -57,11 +82,14 @@ public class TestApiRequest {
 
         ApiRequest request = new ApiRequest.Builder().method(ApiMethod.POST).url("http://localhost:8080/test").build();
 
-        ApiResponse result = request.execute();
+        ApiResponse result = client.execute(request);
 
         assertThat("status code", result.getStatusCode(), is(200));
         assertThat("body", result.getBody(), is(equalTo("Test")));
+        verify(statsd, times(1)).recordExecutionTime(argThat(is("apitime")), longThat(is(greaterThan(0L))));
     }
+
+
 
     @Test
     public void test_it_works_with_a_header() {
@@ -74,10 +102,11 @@ public class TestApiRequest {
                 .header("X_TEST.header", "test-value")
                 .build();
 
-        ApiResponse result = request.execute();
+        ApiResponse result = client.execute(request);
 
         assertThat("status code", result.getStatusCode(), is(200));
         assertThat("body", result.getBody(), is(equalTo("Test")));
+        verify(statsd, times(1)).recordExecutionTime(argThat(is("apitime")), longThat(is(greaterThan(0L))));
     }
 
     @Test
@@ -88,9 +117,10 @@ public class TestApiRequest {
 
         ApiRequest request = new ApiRequest.Builder().method(ApiMethod.GET).url("http://localhost:8080/test?param1=test").build();
 
-        ApiResponse result = request.execute();
+        ApiResponse result = client.execute(request);
 
         assertThat("status code", result.getStatusCode(), is(200));
         assertThat("body", result.getBody(), is(equalTo("Test")));
+        verify(statsd, times(1)).recordExecutionTime(argThat(is("apitime")), longThat(is(greaterThan(0L))));
     }
 }

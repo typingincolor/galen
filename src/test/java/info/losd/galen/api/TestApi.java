@@ -1,14 +1,18 @@
 package info.losd.galen.api;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import info.losd.galen.client.ApiClient;
+import info.losd.galen.client.ApiMethod;
+import info.losd.galen.client.ApiRequest;
+import info.losd.galen.client.ApiResponse;
 import org.hamcrest.Matchers;
+import org.hamcrest.collection.IsMapContaining;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,10 +20,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -48,10 +52,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * THE SOFTWARE.
  */
 public class TestApi {
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(9090));
-
     private MockMvc mockMvc;
+
+    @Mock
+    private ApiClient client;
 
     @InjectMocks
     private GalenApiController apiController;
@@ -70,9 +74,10 @@ public class TestApi {
     public void it_runs_the_posted_api_request() throws Exception {
         String json = "{\"url\":\"http://localhost:9090/test\", \"method\": \"GET\",\"headers\": {\"header1\": \"value1\"}}";
 
-        stubFor(WireMock.get(urlPathEqualTo("/test"))
-                .withHeader("header1", WireMock.equalTo("value1"))
-                .willReturn(aResponse().withBody("Test")));
+        ArgumentCaptor<ApiRequest> argumentCaptor = ArgumentCaptor.forClass(ApiRequest.class);
+        ApiResponse response = new ApiResponse.Builder().statusCode(200).build();
+
+        when(client.execute(argumentCaptor.capture())).thenReturn(response);
 
         MvcResult mvcResult = mockMvc.perform(post("/run").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isOk())
@@ -81,6 +86,11 @@ public class TestApi {
 
         GalenResult result = gson.fromJson(mvcResult.getResponse().getContentAsString(), GalenResult.class);
         assertThat(result.getStatusCode(), is(200));
+
+        ApiRequest captured = argumentCaptor.getValue();
+        assertThat(captured.getMethod(), is(equalTo(ApiMethod.GET)));
+        assertThat(captured.getUrl(), is(equalTo("http://localhost:9090/test")));
+        assertThat(captured.getHeaders(), IsMapContaining.hasEntry("header1", "value1"));
     }
 
     @Test

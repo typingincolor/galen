@@ -1,0 +1,5 @@
+galen:
+    statsd:
+        host: localhost
+        prefix: my.api
+        port: 8125
