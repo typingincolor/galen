@@ -1,10 +1,6 @@
-package info.losd.galen;
+package info.losd.galen.api;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
+import java.util.Map;
 
 /**
  * The MIT License (MIT)
@@ -29,11 +25,32 @@ import org.springframework.context.annotation.ComponentScan;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@SpringBootApplication
-@ComponentScan
-@EnableAutoConfiguration(exclude = {JacksonAutoConfiguration.class})
-public class Galen {
-    public static void main(String[] args) {
-        SpringApplication.run(Galen.class, args);
+public class GalenRequest {
+    private String url;
+    private Map<String, String> headers;
+    private String method;
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 }

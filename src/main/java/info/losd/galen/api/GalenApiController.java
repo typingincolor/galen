@@ -1,10 +1,13 @@
-package info.losd.galen;
+package info.losd.galen.api;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
+import info.losd.galen.client.ApiMethod;
+import info.losd.galen.client.ApiRequest;
+import info.losd.galen.client.ApiResponse;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * The MIT License (MIT)
@@ -29,11 +32,14 @@ import org.springframework.context.annotation.ComponentScan;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@SpringBootApplication
-@ComponentScan
-@EnableAutoConfiguration(exclude = {JacksonAutoConfiguration.class})
-public class Galen {
-    public static void main(String[] args) {
-        SpringApplication.run(Galen.class, args);
+@RestController
+public class GalenApiController {
+    @RequestMapping(value = "/run", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    GalenResult run(@RequestBody GalenRequest galen) {
+        ApiRequest.Builder apiRequestBuilder  = new ApiRequest.Builder().url(galen.getUrl()).method(ApiMethod.valueOf(galen.getMethod()));
+        galen.getHeaders().forEach((header, value) -> apiRequestBuilder.header(header, value));
+        ApiResponse response = apiRequestBuilder.build().execute();
+
+        return new GalenResult.Builder().status(response.getStatusCode()).build();
     }
 }

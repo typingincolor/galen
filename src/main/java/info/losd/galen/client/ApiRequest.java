@@ -87,12 +87,12 @@ public class ApiRequest {
         private ApiMethod method;
         private Map<String, String> headers = new HashMap<>();
 
-        Builder url(String url) {
+        public Builder url(String url) {
             this.url = url;
             return this;
         }
 
-        ApiRequest build() {
+        public ApiRequest build() {
             return new ApiRequest(method, url, headers);
         }
 

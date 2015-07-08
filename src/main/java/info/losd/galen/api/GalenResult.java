@@ -1,10 +1,4 @@
-package info.losd.galen;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
+package info.losd.galen.api;
 
 /**
  * The MIT License (MIT)
@@ -29,11 +23,27 @@ import org.springframework.context.annotation.ComponentScan;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@SpringBootApplication
-@ComponentScan
-@EnableAutoConfiguration(exclude = {JacksonAutoConfiguration.class})
-public class Galen {
-    public static void main(String[] args) {
-        SpringApplication.run(Galen.class, args);
+public class GalenResult {
+    private int statusCode;
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    private GalenResult(int statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public static class Builder {
+        int statusCode;
+
+        public Builder status(int statusCode) {
+            this.statusCode = statusCode;
+            return this;
+        }
+
+        public GalenResult build() {
+            return new GalenResult(statusCode);
+        }
     }
 }
