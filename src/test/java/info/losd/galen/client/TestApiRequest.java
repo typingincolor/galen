@@ -1,5 +1,6 @@
 package info.losd.galen.client;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,6 +56,23 @@ public class TestApiRequest {
                 .willReturn(aResponse().withBody("Test")));
 
         ApiRequest request = new ApiRequest.Builder().method(ApiMethod.POST).url("http://localhost:8080/test").build();
+
+        ApiResponse result = request.execute();
+
+        assertThat("status code", result.getStatusCode(), is(200));
+        assertThat("body", result.getBody(), is(equalTo("Test")));
+    }
+
+    @Test
+    public void test_it_works_with_a_header() {
+        stubFor(get(urlEqualTo("/test"))
+                .withHeader("X_TEST.header", WireMock.equalTo("test-value"))
+                .willReturn(aResponse().withBody("Test")));
+
+        ApiRequest request = new ApiRequest.Builder().method(ApiMethod.GET)
+                .url("http://localhost:8080/test")
+                .header("X_TEST.header", "test-value")
+                .build();
 
         ApiResponse result = request.execute();
 

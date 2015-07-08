@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The MIT License (MIT)
@@ -37,15 +39,22 @@ public class ApiRequest {
 
     private String url;
     private ApiMethod method;
+    private Map<String, String> headers;
 
-    private ApiRequest(ApiMethod method, String url) {
+    private ApiRequest(ApiMethod method, String url, Map<String, String> headers) {
         this.method = method;
         this.url = url;
+        this.headers = headers;
     }
 
     public ApiResponse execute() {
         try {
-            HttpResponse response = request().execute().returnResponse();
+
+            Request request = request();
+
+            headers.forEach((header, value) -> request.addHeader(header, value));
+
+            HttpResponse response = request.execute().returnResponse();
 
             return new ApiResponse.Builder()
                     .statusCode(response.getStatusLine().getStatusCode())
@@ -76,6 +85,7 @@ public class ApiRequest {
     public static class Builder {
         private String url;
         private ApiMethod method;
+        private Map<String, String> headers = new HashMap<>();
 
         Builder url(String url) {
             this.url = url;
@@ -83,11 +93,16 @@ public class ApiRequest {
         }
 
         ApiRequest build() {
-            return new ApiRequest(method, url);
+            return new ApiRequest(method, url, headers);
         }
 
         public Builder method(ApiMethod method) {
             this.method = method;
+            return this;
+        }
+
+        public Builder header(String header, String value) {
+            headers.put(header, value);
             return this;
         }
     }
