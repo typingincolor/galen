@@ -79,4 +79,18 @@ public class TestApiRequest {
         assertThat("status code", result.getStatusCode(), is(200));
         assertThat("body", result.getBody(), is(equalTo("Test")));
     }
+
+    @Test
+    public void test_it_works_with_query_parameters() {
+        stubFor(get(urlPathEqualTo("/test"))
+                .withQueryParam("param1", WireMock.equalTo("test"))
+                .willReturn(aResponse().withBody("Test")));
+
+        ApiRequest request = new ApiRequest.Builder().method(ApiMethod.GET).url("http://localhost:8080/test?param1=test").build();
+
+        ApiResponse result = request.execute();
+
+        assertThat("status code", result.getStatusCode(), is(200));
+        assertThat("body", result.getBody(), is(equalTo("Test")));
+    }
 }
