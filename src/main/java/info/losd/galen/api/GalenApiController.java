@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 /**
  * The MIT License (MIT)
  * <p>
@@ -36,8 +39,6 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 public class GalenApiController {
-    Logger logger = LoggerFactory.getLogger(GalenApiController.class);
-
     @Autowired
     ApiClient client;
 
@@ -51,9 +52,8 @@ public class GalenApiController {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public @ResponseBody String illegalArgumentException(IllegalArgumentException e) {
-        logger.error("IllegalArgument: {}", e.getMessage());
-        return "The method specified is invalid";
+    void illegalArgumentException(HttpServletResponse response) throws IOException{
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.sendError(HttpStatus.BAD_REQUEST.value(), "The method specified is invalid");
     }
 }

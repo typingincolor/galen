@@ -2,6 +2,7 @@ package info.losd.galen.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import info.losd.galen.client.ApiClient;
 import info.losd.galen.client.ApiMethod;
 import info.losd.galen.client.ApiRequest;
@@ -19,6 +20,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
+import java.lang.reflect.Type;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -98,10 +102,11 @@ public class TestApi {
         String json = "{\"url\":\"http://localhost:9090/test\", \"method\": \"JUNK\",\"headers\": {\"header1\": \"value1\"}}";
 
         MvcResult mvcResult = mockMvc.perform(post("/run").contentType(MediaType.APPLICATION_JSON).content(json))
-                .andExpect(status().is4xxClientError())
+                .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-       assertThat(mvcResult.getResponse().getContentAsString(), is(Matchers.equalTo("The method specified is invalid")));
+        assertThat(mvcResult.getResponse().getErrorMessage(),
+                is(equalTo("The method specified is invalid")));
     }
 }
