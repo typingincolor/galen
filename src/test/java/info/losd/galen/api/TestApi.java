@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -80,5 +81,17 @@ public class TestApi {
 
         GalenResult result = gson.fromJson(mvcResult.getResponse().getContentAsString(), GalenResult.class);
         assertThat(result.getStatusCode(), is(200));
+    }
+
+    @Test
+    public void it_handles_an_unknown_method() throws Exception {
+        String json = "{\"url\":\"http://localhost:9090/test\", \"method\": \"JUNK\",\"headers\": {\"header1\": \"value1\"}}";
+
+        MvcResult mvcResult = mockMvc.perform(post("/run").contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().is4xxClientError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+       assertThat(mvcResult.getResponse().getContentAsString(), is(Matchers.equalTo("The method specified is invalid")));
     }
 }

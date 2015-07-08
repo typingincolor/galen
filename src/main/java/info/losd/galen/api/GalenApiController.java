@@ -3,11 +3,11 @@ package info.losd.galen.api;
 import info.losd.galen.client.ApiMethod;
 import info.losd.galen.client.ApiRequest;
 import info.losd.galen.client.ApiResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * The MIT License (MIT)
@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class GalenApiController {
+    Logger logger = LoggerFactory.getLogger(GalenApiController.class);
+
     @RequestMapping(value = "/run", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     GalenResult run(@RequestBody GalenRequest galen) {
         ApiRequest.Builder apiRequestBuilder  = new ApiRequest.Builder().url(galen.getUrl()).method(ApiMethod.valueOf(galen.getMethod()));
@@ -41,5 +43,12 @@ public class GalenApiController {
         ApiResponse response = apiRequestBuilder.build().execute();
 
         return new GalenResult.Builder().status(response.getStatusCode()).build();
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public @ResponseBody String illegalArgumentException(IllegalArgumentException e) {
+        logger.error("IllegalArgument: {}", e.getMessage());
+        return "The method specified is invalid";
     }
 }
