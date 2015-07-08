@@ -54,7 +54,11 @@ public class ApiRequest {
 
             headers.forEach((header, value) -> request.addHeader(header, value));
 
+            long start = System.nanoTime();
             HttpResponse response = request.execute().returnResponse();
+            long end = System.nanoTime();
+
+            logger.info("Time taken: {}", (end - start) / 1000000);
 
             return new ApiResponse.Builder()
                     .statusCode(response.getStatusLine().getStatusCode())
