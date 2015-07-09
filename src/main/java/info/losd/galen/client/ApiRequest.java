@@ -38,7 +38,7 @@ public class ApiRequest {
     }
 
     public static ApiRequest.Builder url(String url) {
-       return new ApiRequest.Builder(url);
+        return new ApiRequest.Builder(url);
     }
 
     public String getUrl() {
