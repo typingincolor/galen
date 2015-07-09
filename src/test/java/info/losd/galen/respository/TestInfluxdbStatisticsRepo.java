@@ -12,9 +12,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -64,7 +65,12 @@ public class TestInfluxdbStatisticsRepo {
         ArgumentCaptor<String> retentionPolicy = ArgumentCaptor.forClass(String.class);
 
         verify(db, times(1)).write(dbname.capture(), retentionPolicy.capture(), point.capture());
-        assertThat("point", point.getValue().lineProtocol(), startsWith("statistic response_time=100,status_code=200"));
+        assertThat("point", point.getValue().toString(),
+                allOf(containsString("fields={response_time=100, status_code=200}"),
+                        containsString("name=statistic"),
+                        containsString("precision=MILLISECONDS")
+                ));
+
         assertThat("dbname", dbname.getValue(), is(equalTo("galen")));
         assertThat("retentionPolicy", retentionPolicy.getValue(), is(equalTo("default")));
     }
