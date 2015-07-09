@@ -1,6 +1,7 @@
 package info.losd.galen.client;
 
-import com.timgroup.statsd.StatsDClient;
+import info.losd.galen.repository.Statistic;
+import info.losd.galen.repository.StatisticsRepo;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -40,7 +41,7 @@ public class ApiClient {
     Logger logger = LoggerFactory.getLogger(ApiClient.class);
 
     @Autowired
-    StatsDClient statsd;
+    StatisticsRepo statisticsRepo;
 
     public ApiResponse execute(ApiRequest req) {
         try {
@@ -52,7 +53,11 @@ public class ApiClient {
             HttpResponse response = request.execute().returnResponse();
             long end = System.nanoTime();
 
-            statsd.recordExecutionTime("apitime", (end - start) / 1000000);
+            Statistic stat = new Statistic.Builder()
+                    .duration((end - start) / 1000000)
+                    .statusCode(response.getStatusLine().getStatusCode())
+                    .build();
+            statisticsRepo.save(stat);
 
             return new ApiResponse.Builder()
                     .statusCode(response.getStatusLine().getStatusCode())

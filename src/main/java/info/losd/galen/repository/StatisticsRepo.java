@@ -1,12 +1,5 @@
-package info.losd.galen.configuration;
+package info.losd.galen.repository;
 
-import com.timgroup.statsd.NonBlockingStatsDClient;
-import com.timgroup.statsd.StatsDClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * The MIT License (MIT)
@@ -31,20 +24,6 @@ import org.springframework.context.annotation.Configuration;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@Configuration
-public class StatsdConfiguration {
-    @Autowired
-    StatsdSettings settings;
-
-    Logger logger = LoggerFactory.getLogger(StatsdConfiguration.class);
-
-    @Bean
-    StatsDClient statsDClient() throws Exception {
-        logger.info("prefix: {}, host: {}, port: {}",
-                settings.getPrefix(),
-                settings.getHost(),
-                settings.getPort());
-
-        return new NonBlockingStatsDClient(settings.getPrefix(), settings.getHost(), settings.getPort());
-    }
+public interface StatisticsRepo {
+    void save(Statistic s);
 }

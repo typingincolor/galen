@@ -4,8 +4,6 @@ import info.losd.galen.client.ApiClient;
 import info.losd.galen.client.ApiMethod;
 import info.losd.galen.client.ApiRequest;
 import info.losd.galen.client.ApiResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

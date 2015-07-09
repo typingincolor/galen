@@ -33,7 +33,7 @@ dependencies {
     compile 'org.apache.httpcomponents:fluent-hc:4.5'
     compile 'commons-io:commons-io:2.4'
     compile 'com.google.code.gson:gson:2.3.1'
-    compile 'com.timgroup:java-statsd-client:3.0.1'
+    compile 'org.influxdb:influxdb-java:1.5'
 
     testCompile 'junit:junit:4.12'
     testCompile 'com.github.tomakehurst:wiremock:1.56'

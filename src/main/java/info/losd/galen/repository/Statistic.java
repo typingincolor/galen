@@ -1,7 +1,4 @@
-package info.losd.galen.client;
-
-import java.util.HashMap;
-import java.util.Map;
+package info.losd.galen.repository;
 
 /**
  * The MIT License (MIT)
@@ -26,51 +23,39 @@ import java.util.Map;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class ApiRequest {
-    private String url;
-    private ApiMethod method;
-    private Map<String, String> headers;
+public class Statistic {
+    private long duration;
+    private int statusCode;
 
-    private ApiRequest(ApiMethod method, String url, Map<String, String> headers) {
-        this.method = method;
-        this.url = url;
-        this.headers = headers;
+    private Statistic(long duration, int statusCode) {
+        this.duration = duration;
+        this.statusCode = statusCode;
     }
 
-    public String getUrl() {
-        return url;
+    public long getDuration() {
+        return duration;
     }
 
-    public ApiMethod getMethod() {
-        return method;
-    }
-
-    public Map<String, String> getHeaders() {
-        return headers;
+    public int getStatusCode() {
+        return statusCode;
     }
 
     public static class Builder {
-        private String url;
-        private ApiMethod method;
-        private Map<String, String> headers = new HashMap<>();
+        private long duration;
+        private int statusCode;
 
-        public Builder url(String url) {
-            this.url = url;
+        public Builder duration(long duration) {
+            this.duration = duration;
             return this;
         }
 
-        public ApiRequest build() {
-            return new ApiRequest(method, url, headers);
-        }
-
-        public Builder method(ApiMethod method) {
-            this.method = method;
+        public Builder statusCode(int statusCode) {
+            this.statusCode = statusCode;
             return this;
         }
 
-        public Builder header(String header, String value) {
-            headers.put(header, value);
-            return this;
+        public Statistic build() {
+            return new Statistic(duration, statusCode);
         }
     }
 }
