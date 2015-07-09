@@ -42,6 +42,9 @@ public class InfluxDbConfiguration {
     InfluxDB influxDB() throws Exception {
         logger.info("url: {}", settings.getUrl());
 
-        return InfluxDBFactory.connect(settings.getUrl(), settings.getUsername(), settings.getPassword());
+        InfluxDB db = InfluxDBFactory.connect(settings.getUrl(),
+                settings.getUsername(),
+                settings.getPassword());
+        return db;
     }
 }

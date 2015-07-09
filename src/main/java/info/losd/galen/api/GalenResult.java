@@ -34,12 +34,15 @@ public class GalenResult {
         this.statusCode = statusCode;
     }
 
+    public static GalenResult.Builder statusCode(int statusCode) {
+        return new GalenResult.Builder(statusCode);
+    }
+
     public static class Builder {
         int statusCode;
 
-        public Builder status(int statusCode) {
+        private Builder(int statusCode) {
             this.statusCode = statusCode;
-            return this;
         }
 
         public GalenResult build() {

@@ -2,6 +2,9 @@
 
 repositories {
     jcenter()
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 buildscript {
@@ -33,7 +36,10 @@ dependencies {
     compile 'org.apache.httpcomponents:fluent-hc:4.5'
     compile 'commons-io:commons-io:2.4'
     compile 'com.google.code.gson:gson:2.3.1'
-    compile 'org.influxdb:influxdb-java:1.5'
+    compile name: 'influxdb-java-2.0-SNAPSHOT'
+    compile 'com.google.guava:guava:18.0'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.squareup.okhttp:okhttp:2.4.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'com.github.tomakehurst:wiremock:1.56'

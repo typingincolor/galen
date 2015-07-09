@@ -37,6 +37,10 @@ public class ApiRequest {
         this.headers = headers;
     }
 
+    public static ApiRequest.Builder url(String url) {
+       return new ApiRequest.Builder(url);
+    }
+
     public String getUrl() {
         return url;
     }
@@ -54,9 +58,8 @@ public class ApiRequest {
         private ApiMethod method;
         private Map<String, String> headers = new HashMap<>();
 
-        public Builder url(String url) {
+        private Builder(String url) {
             this.url = url;
-            return this;
         }
 
         public ApiRequest build() {

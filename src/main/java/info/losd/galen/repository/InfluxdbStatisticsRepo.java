@@ -1,6 +1,11 @@
 package info.losd.galen.repository;
 
+import org.influxdb.InfluxDB;
+import org.influxdb.dto.Point;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * The MIT License (MIT)
@@ -26,9 +31,18 @@ import org.springframework.stereotype.Repository;
  * THE SOFTWARE.
  */
 @Repository
-public class InfluxdbStatisticRepo implements StatisticsRepo {
+public class InfluxdbStatisticsRepo implements StatisticsRepo {
+    @Autowired
+    InfluxDB influxDB;
+
     @Override
     public void save(Statistic s) {
+        Point point = Point.measurement("statistic")
+                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .field("response_time", s.getDuration())
+                .field("status_code", s.getStatusCode())
+                .build();
 
+        influxDB.write("galen", "default", point);
     }
 }

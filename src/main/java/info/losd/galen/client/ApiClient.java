@@ -53,13 +53,12 @@ public class ApiClient {
             HttpResponse response = request.execute().returnResponse();
             long end = System.nanoTime();
 
-            Statistic stat = new Statistic.Builder()
-                    .duration((end - start) / 1000000)
+            Statistic stat = Statistic.duration((end - start) / 1000000)
                     .statusCode(response.getStatusLine().getStatusCode())
                     .build();
             statisticsRepo.save(stat);
 
-            return new ApiResponse.Builder()
+            return ApiResponse
                     .statusCode(response.getStatusLine().getStatusCode())
                     .body(getResponseBody(response)).build();
         } catch (IOException e) {

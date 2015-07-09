@@ -40,13 +40,16 @@ public class Statistic {
         return statusCode;
     }
 
+    public static Statistic.Builder duration(long duration) {
+        return new Statistic.Builder(duration);
+    }
+
     public static class Builder {
         private long duration;
         private int statusCode;
 
-        public Builder duration(long duration) {
+        private Builder(long duration) {
             this.duration = duration;
-            return this;
         }
 
         public Builder statusCode(int statusCode) {

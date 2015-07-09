@@ -35,6 +35,10 @@ public class ApiResponse {
         return statusCode;
     }
 
+    public static ApiResponse.Builder statusCode(int statusCode) {
+        return new ApiResponse.Builder(statusCode);
+    }
+
     private ApiResponse(int statusCode, String body) {
         this.statusCode = statusCode;
         this.body = body;
@@ -44,18 +48,17 @@ public class ApiResponse {
         int statusCode;
         String body;
 
-        public ApiResponse build() {
-            return new ApiResponse(statusCode, body);
-        }
-
-        public Builder statusCode(int statusCode) {
+        private Builder(int statusCode) {
             this.statusCode = statusCode;
-            return this;
         }
 
         public Builder body(String body) {
             this.body = body;
             return this;
+        }
+
+        public ApiResponse build() {
+            return new ApiResponse(statusCode, body);
         }
     }
 }

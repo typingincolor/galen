@@ -63,7 +63,7 @@ public class TestApiClient {
         stubFor(get(urlEqualTo("/test"))
                 .willReturn(aResponse().withBody("Test")));
 
-        ApiRequest request = new ApiRequest.Builder().method(ApiMethod.GET).url("http://localhost:8080/test").build();
+        ApiRequest request = ApiRequest.url("http://localhost:8080/test").method(ApiMethod.GET).build();
         run(request);
     }
 
@@ -72,7 +72,7 @@ public class TestApiClient {
         stubFor(post(urlEqualTo("/test"))
                 .willReturn(aResponse().withBody("Test")));
 
-        ApiRequest request = new ApiRequest.Builder().method(ApiMethod.POST).url("http://localhost:8080/test").build();
+        ApiRequest request = ApiRequest.url("http://localhost:8080/test").method(ApiMethod.POST).build();
         run(request);
     }
 
@@ -82,8 +82,9 @@ public class TestApiClient {
                 .withHeader("X_TEST.header", WireMock.equalTo("test-value"))
                 .willReturn(aResponse().withBody("Test")));
 
-        ApiRequest request = new ApiRequest.Builder().method(ApiMethod.GET)
+        ApiRequest request = ApiRequest
                 .url("http://localhost:8080/test")
+                .method(ApiMethod.GET)
                 .header("X_TEST.header", "test-value")
                 .build();
         run(request);
@@ -95,7 +96,7 @@ public class TestApiClient {
                 .withQueryParam("param1", WireMock.equalTo("test"))
                 .willReturn(aResponse().withBody("Test")));
 
-        ApiRequest request = new ApiRequest.Builder().method(ApiMethod.GET).url("http://localhost:8080/test?param1=test").build();
+        ApiRequest request = ApiRequest.url("http://localhost:8080/test?param1=test").method(ApiMethod.GET).build();
         run(request);
     }
 
@@ -105,7 +106,7 @@ public class TestApiClient {
 
         ApiResponse result = client.execute(request);
 
-        assertThat("status code", result.getStatusCode(), is(200));
+        assertThat("statusCode code", result.getStatusCode(), is(200));
         assertThat("body", result.getBody(), is(equalTo("Test")));
 
         verify(statisticsRepo, times(1)).save(argumentCaptor.capture());

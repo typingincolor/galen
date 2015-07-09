@@ -42,11 +42,11 @@ public class GalenApiController {
 
     @RequestMapping(value = "/run", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     GalenResult run(@RequestBody GalenRequest galen) {
-        ApiRequest.Builder apiRequestBuilder  = new ApiRequest.Builder().url(galen.getUrl()).method(ApiMethod.valueOf(galen.getMethod()));
+        ApiRequest.Builder apiRequestBuilder  =  ApiRequest.url(galen.getUrl()).method(ApiMethod.valueOf(galen.getMethod()));
         galen.getHeaders().forEach((header, value) -> apiRequestBuilder.header(header, value));
         ApiResponse response = client.execute(apiRequestBuilder.build());
 
-        return new GalenResult.Builder().status(response.getStatusCode()).build();
+        return GalenResult.statusCode(response.getStatusCode()).build();
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
