@@ -35,7 +35,7 @@ public class ApiResponse {
         return statusCode;
     }
 
-    public static ApiResponse.Builder statusCode(int statusCode) {
+    public static Body statusCode(int statusCode) {
         return new ApiResponse.Builder(statusCode);
     }
 
@@ -44,7 +44,7 @@ public class ApiResponse {
         this.body = body;
     }
 
-    public static class Builder {
+    public static class Builder implements Body, Build {
         int statusCode;
         String body;
 
@@ -52,7 +52,7 @@ public class ApiResponse {
             this.statusCode = statusCode;
         }
 
-        public Builder body(String body) {
+        public Build body(String body) {
             this.body = body;
             return this;
         }
@@ -60,5 +60,13 @@ public class ApiResponse {
         public ApiResponse build() {
             return new ApiResponse(statusCode, body);
         }
+    }
+
+    public interface Body {
+        Build body(String body);
+    }
+
+    public interface Build {
+        ApiResponse build();
     }
 }

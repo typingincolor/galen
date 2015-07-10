@@ -42,7 +42,7 @@ public class GalenApiController {
 
     @RequestMapping(value = "/run", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     GalenResult run(@RequestBody GalenRequest galen) {
-        ApiRequest.Builder apiRequestBuilder = ApiRequest.url(galen.getUrl()).method(ApiMethod.valueOf(galen.getMethod()));
+        ApiRequest.Header apiRequestBuilder = ApiRequest.url(galen.getUrl()).method(ApiMethod.valueOf(galen.getMethod()));
         galen.getHeaders().forEach((header, value) -> apiRequestBuilder.header(header, value));
         ApiResponse response = client.execute(apiRequestBuilder.build());
 

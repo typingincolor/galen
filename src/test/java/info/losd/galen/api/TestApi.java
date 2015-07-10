@@ -74,7 +74,7 @@ public class TestApi {
         String json = "{\"url\":\"http://localhost:9090/test\", \"method\": \"GET\",\"headers\": {\"header1\": \"value1\"}}";
 
         ArgumentCaptor<ApiRequest> argumentCaptor = ArgumentCaptor.forClass(ApiRequest.class);
-        ApiResponse response = ApiResponse.statusCode(200).build();
+        ApiResponse response = ApiResponse.statusCode(200).body(null).build();
 
         when(client.execute(argumentCaptor.capture())).thenReturn(response);
 

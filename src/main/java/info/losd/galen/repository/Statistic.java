@@ -40,11 +40,11 @@ public class Statistic {
         return statusCode;
     }
 
-    public static Statistic.Builder duration(long duration) {
+    public static Statistic.StatusCode duration(long duration) {
         return new Statistic.Builder(duration);
     }
 
-    public static class Builder {
+    public static class Builder implements StatusCode, Build {
         private long duration;
         private int statusCode;
 
@@ -52,7 +52,7 @@ public class Statistic {
             this.duration = duration;
         }
 
-        public Builder statusCode(int statusCode) {
+        public Build statusCode(int statusCode) {
             this.statusCode = statusCode;
             return this;
         }
@@ -60,5 +60,13 @@ public class Statistic {
         public Statistic build() {
             return new Statistic(duration, statusCode);
         }
+    }
+
+    public interface StatusCode {
+        Build statusCode(int statusCode);
+    }
+
+    public interface Build {
+        Statistic build();
     }
 }

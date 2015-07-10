@@ -37,7 +37,7 @@ public class ApiRequest {
         this.headers = headers;
     }
 
-    public static ApiRequest.Builder url(String url) {
+    public static Method url(String url) {
         return new ApiRequest.Builder(url);
     }
 
@@ -53,7 +53,7 @@ public class ApiRequest {
         return headers;
     }
 
-    public static class Builder {
+    public static class Builder implements Method, Header, Build {
         private String url;
         private ApiMethod method;
         private Map<String, String> headers = new HashMap<>();
@@ -66,14 +66,27 @@ public class ApiRequest {
             return new ApiRequest(method, url, headers);
         }
 
-        public Builder method(ApiMethod method) {
+        public Header method(ApiMethod method) {
             this.method = method;
             return this;
         }
 
-        public Builder header(String header, String value) {
+        public Header header(String header, String value) {
             headers.put(header, value);
             return this;
         }
+    }
+
+    public interface Method {
+        Header method(ApiMethod method);
+    }
+
+    public interface Header {
+        Header header(String header, String value);
+        ApiRequest build();
+    }
+
+    public interface Build {
+        ApiRequest build();
     }
 }
