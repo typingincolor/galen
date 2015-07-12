@@ -56,7 +56,7 @@ public class TestInfluxdbStatisticsRepo {
 
     @Test
     public void test_it_writes_to_influxdb() {
-        Statistic stat = Statistic.name("api_name").duration(100L).statusCode(200).build();
+        Statistic stat = Statistic.tag("api_name").duration(100L).statusCode(200).build();
 
         repo.save(stat);
 

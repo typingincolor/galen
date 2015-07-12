@@ -26,10 +26,10 @@ package info.losd.galen.repository;
 public class Statistic {
     private long duration;
     private int statusCode;
-    private String name;
+    private String tag;
 
-    private Statistic(String name, long duration, int statusCode) {
-        this.name = name;
+    private Statistic(String tag, long duration, int statusCode) {
+        this.tag = tag;
         this.duration = duration;
         this.statusCode = statusCode;
     }
@@ -42,21 +42,21 @@ public class Statistic {
         return statusCode;
     }
 
-    public String getName() {
-        return name;
+    public String getTag() {
+        return tag;
     }
 
-    public static Statistic.Duration name(String name) {
+    public static Statistic.Duration tag(String name) {
         return new Statistic.Builder(name);
     }
 
     public static class Builder implements Duration, StatusCode, Build {
         private long duration;
         private int statusCode;
-        private String name;
+        private String tag;
 
-        private Builder(String name) {
-            this.name = name;
+        private Builder(String tag) {
+            this.tag = tag;
         }
 
         public StatusCode duration(long duration) {
@@ -70,7 +70,7 @@ public class Statistic {
         }
 
         public Statistic build() {
-            return new Statistic(name, duration, statusCode);
+            return new Statistic(tag, duration, statusCode);
         }
     }
 

@@ -39,7 +39,7 @@ public class InfluxdbStatisticsRepo implements StatisticsRepo {
     public void save(Statistic s) {
         Point point = Point.measurement("statistic")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .tag("api", s.getName())
+                .tag("api", s.getTag())
                 .field("response_time", s.getDuration())
                 .field("status_code", s.getStatusCode())
                 .build();

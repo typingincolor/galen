@@ -27,24 +27,24 @@ import java.util.Map;
  * THE SOFTWARE.
  */
 public class ApiRequest {
-    private String name;
+    private String tag;
     private String url;
     private ApiMethod method;
     private Map<String, String> headers;
 
-    private ApiRequest(String name, ApiMethod method, String url, Map<String, String> headers) {
-        this.name = name;
+    private ApiRequest(String tag, ApiMethod method, String url, Map<String, String> headers) {
+        this.tag = tag;
         this.method = method;
         this.url = url;
         this.headers = headers;
     }
 
-    public static ApiRequest.Url name(String name) {
-        return new ApiRequest.Builder(name);
+    public static ApiRequest.Url tag(String tag) {
+        return new ApiRequest.Builder(tag);
     }
 
-    public String getName() {
-        return name;
+    public String getTag() {
+        return tag;
     }
 
     public String getUrl() {
@@ -60,17 +60,17 @@ public class ApiRequest {
     }
 
     public static class Builder implements Url, Method, Header, Build {
-        private String name;
+        private String tag;
         private String url;
         private ApiMethod method;
         private Map<String, String> headers = new HashMap<>();
 
-        private Builder(String name) {
-            this.name = name;
+        private Builder(String tag) {
+            this.tag = tag;
         }
 
         public ApiRequest build() {
-            return new ApiRequest(name, method, url, headers);
+            return new ApiRequest(tag, method, url, headers);
         }
 
         public Method url(String url) {

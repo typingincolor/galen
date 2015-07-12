@@ -53,7 +53,7 @@ public class ApiClient {
             HttpResponse response = request.execute().returnResponse();
             long end = System.nanoTime();
 
-            Statistic stat = Statistic.name(req.getName())
+            Statistic stat = Statistic.tag(req.getTag())
                     .duration((end - start) / 1000000)
                     .statusCode(response.getStatusLine().getStatusCode())
                     .build();

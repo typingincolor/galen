@@ -64,7 +64,7 @@ public class TestApiClient {
                 .willReturn(aResponse().withBody("Test")));
 
         ApiRequest request = ApiRequest
-                .name("test_api")
+                .tag("test_api")
                 .url("http://localhost:8080/test")
                 .method(ApiMethod.GET)
                 .build();
@@ -77,7 +77,7 @@ public class TestApiClient {
                 .willReturn(aResponse().withBody("Test")));
 
         ApiRequest request = ApiRequest
-                .name("test_api")
+                .tag("test_api")
                 .url("http://localhost:8080/test")
                 .method(ApiMethod.POST)
                 .build();
@@ -91,7 +91,7 @@ public class TestApiClient {
                 .willReturn(aResponse().withBody("Test")));
 
         ApiRequest request = ApiRequest
-                .name("test_api")
+                .tag("test_api")
                 .url("http://localhost:8080/test")
                 .method(ApiMethod.GET)
                 .header("X_TEST.header", "test-value")
@@ -106,7 +106,7 @@ public class TestApiClient {
                 .willReturn(aResponse().withBody("Test")));
 
         ApiRequest request = ApiRequest
-                .name("test_api")
+                .tag("test_api")
                 .url("http://localhost:8080/test?param1=test")
                 .method(ApiMethod.GET)
                 .build();
@@ -125,6 +125,6 @@ public class TestApiClient {
         verify(statisticsRepo, times(1)).save(argumentCaptor.capture());
         assertThat(argumentCaptor.getValue().getDuration(), is(greaterThan(0L)));
         assertThat(argumentCaptor.getValue().getStatusCode(), is(200));
-        assertThat(argumentCaptor.getValue().getName(), is(equalTo("test_api")));
+        assertThat(argumentCaptor.getValue().getTag(), is(equalTo("test_api")));
     }
 }

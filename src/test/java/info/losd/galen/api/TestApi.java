@@ -71,7 +71,7 @@ public class TestApi {
 
     @Test
     public void it_runs_the_posted_api_request() throws Exception {
-        String json = "{\"name\":\"test_api\",\"url\":\"http://localhost:9090/test\", \"method\": \"GET\",\"headers\": {\"header1\": \"value1\"}}";
+        String json = "{\"tag\":\"test_api\",\"url\":\"http://localhost:9090/test\", \"method\": \"GET\",\"headers\": {\"header1\": \"value1\"}}";
 
         ArgumentCaptor<ApiRequest> argumentCaptor = ArgumentCaptor.forClass(ApiRequest.class);
         ApiResponse response = ApiResponse.statusCode(200).body(null).build();
@@ -87,7 +87,7 @@ public class TestApi {
         assertThat(result.getStatusCode(), is(200));
 
         ApiRequest captured = argumentCaptor.getValue();
-        assertThat(captured.getName(), is(equalTo("test_api")));
+        assertThat(captured.getTag(), is(equalTo("test_api")));
         assertThat(captured.getMethod(), is(equalTo(ApiMethod.GET)));
         assertThat(captured.getUrl(), is(equalTo("http://localhost:9090/test")));
         assertThat(captured.getHeaders(), IsMapContaining.hasEntry("header1", "value1"));
@@ -95,7 +95,7 @@ public class TestApi {
 
     @Test
     public void it_handles_an_unknown_method() throws Exception {
-        String json = "{\"name\":\"test_api\",\"url\":\"http://localhost:9090/test\", \"method\": \"JUNK\",\"headers\": {\"header1\": \"value1\"}}";
+        String json = "{\"tag\":\"test_api\",\"url\":\"http://localhost:9090/test\", \"method\": \"JUNK\",\"headers\": {\"header1\": \"value1\"}}";
 
         MvcResult mvcResult = mockMvc.perform(post("/run").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
