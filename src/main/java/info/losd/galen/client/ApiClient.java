@@ -53,7 +53,8 @@ public class ApiClient {
             HttpResponse response = request.execute().returnResponse();
             long end = System.nanoTime();
 
-            Statistic stat = Statistic.duration((end - start) / 1000000)
+            Statistic stat = Statistic.name(req.getName())
+                    .duration((end - start) / 1000000)
                     .statusCode(response.getStatusLine().getStatusCode())
                     .build();
             statisticsRepo.save(stat);
@@ -61,13 +62,16 @@ public class ApiClient {
             return ApiResponse
                     .statusCode(response.getStatusLine().getStatusCode())
                     .body(getResponseBody(response)).build();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             logger.error("IO Exception", e);
             throw new RuntimeException(e);
         }
     }
 
-    private String getResponseBody(HttpResponse response) throws IOException {
+    private String getResponseBody(HttpResponse response) throws
+            IOException
+    {
         StringWriter writer = new StringWriter();
         IOUtils.copy(response.getEntity().getContent(), writer);
         return writer.toString();

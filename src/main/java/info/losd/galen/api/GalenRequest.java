@@ -26,9 +26,18 @@ import java.util.Map;
  * THE SOFTWARE.
  */
 public class GalenRequest {
+    private String name;
     private String url;
     private Map<String, String> headers;
     private String method;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getUrl() {
         return url;

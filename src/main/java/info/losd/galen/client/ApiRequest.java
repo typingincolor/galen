@@ -27,18 +27,24 @@ import java.util.Map;
  * THE SOFTWARE.
  */
 public class ApiRequest {
+    private String name;
     private String url;
     private ApiMethod method;
     private Map<String, String> headers;
 
-    private ApiRequest(ApiMethod method, String url, Map<String, String> headers) {
+    private ApiRequest(String name, ApiMethod method, String url, Map<String, String> headers) {
+        this.name = name;
         this.method = method;
         this.url = url;
         this.headers = headers;
     }
 
-    public static Method url(String url) {
-        return new ApiRequest.Builder(url);
+    public static ApiRequest.Url name(String name) {
+        return new ApiRequest.Builder(name);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getUrl() {
@@ -53,17 +59,23 @@ public class ApiRequest {
         return headers;
     }
 
-    public static class Builder implements Method, Header, Build {
+    public static class Builder implements Url, Method, Header, Build {
+        private String name;
         private String url;
         private ApiMethod method;
         private Map<String, String> headers = new HashMap<>();
 
-        private Builder(String url) {
-            this.url = url;
+        private Builder(String name) {
+            this.name = name;
         }
 
         public ApiRequest build() {
-            return new ApiRequest(method, url, headers);
+            return new ApiRequest(name, method, url, headers);
+        }
+
+        public Method url(String url) {
+            this.url = url;
+            return this;
         }
 
         public Header method(ApiMethod method) {
@@ -75,6 +87,10 @@ public class ApiRequest {
             headers.put(header, value);
             return this;
         }
+    }
+
+    public interface Url {
+        Method url(String url);
     }
 
     public interface Method {

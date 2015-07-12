@@ -63,7 +63,11 @@ public class TestApiClient {
         stubFor(get(urlEqualTo("/test"))
                 .willReturn(aResponse().withBody("Test")));
 
-        ApiRequest request = ApiRequest.url("http://localhost:8080/test").method(ApiMethod.GET).build();
+        ApiRequest request = ApiRequest
+                .name("test_api")
+                .url("http://localhost:8080/test")
+                .method(ApiMethod.GET)
+                .build();
         run(request);
     }
 
@@ -72,7 +76,11 @@ public class TestApiClient {
         stubFor(post(urlEqualTo("/test"))
                 .willReturn(aResponse().withBody("Test")));
 
-        ApiRequest request = ApiRequest.url("http://localhost:8080/test").method(ApiMethod.POST).build();
+        ApiRequest request = ApiRequest
+                .name("test_api")
+                .url("http://localhost:8080/test")
+                .method(ApiMethod.POST)
+                .build();
         run(request);
     }
 
@@ -83,6 +91,7 @@ public class TestApiClient {
                 .willReturn(aResponse().withBody("Test")));
 
         ApiRequest request = ApiRequest
+                .name("test_api")
                 .url("http://localhost:8080/test")
                 .method(ApiMethod.GET)
                 .header("X_TEST.header", "test-value")
@@ -96,7 +105,11 @@ public class TestApiClient {
                 .withQueryParam("param1", WireMock.equalTo("test"))
                 .willReturn(aResponse().withBody("Test")));
 
-        ApiRequest request = ApiRequest.url("http://localhost:8080/test?param1=test").method(ApiMethod.GET).build();
+        ApiRequest request = ApiRequest
+                .name("test_api")
+                .url("http://localhost:8080/test?param1=test")
+                .method(ApiMethod.GET)
+                .build();
         run(request);
     }
 
@@ -112,5 +125,6 @@ public class TestApiClient {
         verify(statisticsRepo, times(1)).save(argumentCaptor.capture());
         assertThat(argumentCaptor.getValue().getDuration(), is(greaterThan(0L)));
         assertThat(argumentCaptor.getValue().getStatusCode(), is(200));
+        assertThat(argumentCaptor.getValue().getName(), is(equalTo("test_api")));
     }
 }

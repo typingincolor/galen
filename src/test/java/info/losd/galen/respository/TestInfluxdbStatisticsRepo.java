@@ -56,7 +56,7 @@ public class TestInfluxdbStatisticsRepo {
 
     @Test
     public void test_it_writes_to_influxdb() {
-        Statistic stat = Statistic.duration(100L).statusCode(200).build();
+        Statistic stat = Statistic.name("api_name").duration(100L).statusCode(200).build();
 
         repo.save(stat);
 
@@ -68,7 +68,8 @@ public class TestInfluxdbStatisticsRepo {
         assertThat("point", point.getValue().toString(),
                 allOf(containsString("fields={response_time=100, status_code=200}"),
                         containsString("name=statistic"),
-                        containsString("precision=MILLISECONDS")
+                        containsString("precision=MILLISECONDS"),
+                        containsString("tags={api=api_name}")
                 ));
 
         assertThat("dbname", dbname.getValue(), is(equalTo("galen")));
