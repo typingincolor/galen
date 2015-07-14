@@ -2,7 +2,11 @@ package info.losd.galen.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import info.losd.galen.api.GalenApiController;
 import org.springframework.hateoas.ResourceSupport;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * The MIT License (MIT)
@@ -33,6 +37,9 @@ public class Healthcheck extends ResourceSupport {
     @JsonCreator
     public Healthcheck(@JsonProperty("name") String name) {
         this.name = name;
+        this.add(linkTo(methodOn(GalenApiController.class).getHealtcheck(name)).withSelfRel());
+        this.add(linkTo(methodOn(GalenApiController.class).getStatistics(name, "2m")).withRel("statistics"));
+        this.add(linkTo(methodOn(GalenApiController.class).getMean(name, "2m")).withRel("mean"));
     }
 
     public String getName() {

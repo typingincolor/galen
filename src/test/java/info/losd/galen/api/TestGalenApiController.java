@@ -60,7 +60,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class TestApi {
+public class TestGalenApiController {
     private MockMvc mockMvc;
 
     @Mock
@@ -140,10 +140,27 @@ public class TestApi {
 
         assertThat(result, is(IsCollectionWithSize.hasSize(3)));
         assertThat(result.get(0).getName(), is(equalTo("healthcheck1")));
-        assertThat(result.get(0).getLink("self").toString(), is(equalTo("<http://localhost/healthchecks/healthcheck1>;rel=\"self\"")));
-        assertThat(result.get(1).getName(), is(equalTo("healthcheck2")));
-        assertThat(result.get(1).getLink("self").toString(), is(equalTo("<http://localhost/healthchecks/healthcheck2>;rel=\"self\"")));
-        assertThat(result.get(2).getName(), is(equalTo("healthcheck3")));
-        assertThat(result.get(2).getLink("self").toString(), is(equalTo("<http://localhost/healthchecks/healthcheck3>;rel=\"self\"")));
+
+        checkHealthcheck(result.get(0), "healthcheck1");
+        checkHealthcheck(result.get(1), "healthcheck2");
+        checkHealthcheck(result.get(2), "healthcheck3");
+    }
+
+    @Test
+    public void it_gets_the_details_of_a_healthcheck() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get("/healthchecks/healthcheck1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        Healthcheck result = gson.fromJson(mvcResult.getResponse().getContentAsString(), Healthcheck.class);
+
+        checkHealthcheck(result, "healthcheck1");
+    }
+
+    private void checkHealthcheck(Healthcheck healthcheck, String text) {
+        assertThat(healthcheck.getLink("self").toString(), is(equalTo("<http://localhost/healthchecks/" + text + ">;rel=\"self\"")));
+        assertThat(healthcheck.getLink("statistics").toString(), is(equalTo("<http://localhost/healthchecks/" + text + "/statistics?period=2m>;rel=\"statistics\"")));
+        assertThat(healthcheck.getLink("mean").toString(), is(equalTo("<http://localhost/healthchecks/" + text + "/statistics/mean?period=2m>;rel=\"mean\"")));
     }
 }

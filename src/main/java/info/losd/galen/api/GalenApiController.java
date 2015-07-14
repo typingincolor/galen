@@ -20,9 +20,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -70,10 +67,7 @@ public class GalenApiController {
         List<Healthcheck> result = new LinkedList<>();
 
         repo.getApis().forEach(healthcheck -> {
-            Healthcheck dto = new Healthcheck(healthcheck.getName());
-            dto.add(linkTo(methodOn(GalenApiController.class).getHealtcheck(healthcheck.getName())).withSelfRel());
-
-            result.add(dto);
+            result.add(new Healthcheck(healthcheck.getName()));
         });
 
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -81,8 +75,26 @@ public class GalenApiController {
 
     @RequestMapping(value = "/healthchecks/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public HttpEntity<String> getHealtcheck(@PathVariable String name) {
-        return new ResponseEntity<>("hello", HttpStatus.OK);
+    public HttpEntity<Healthcheck> getHealtcheck(@PathVariable String name) {
+        return new ResponseEntity<>(new Healthcheck(name), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/healthchecks/{name}/statistics", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public HttpEntity<String> getStatistics(@PathVariable String name,
+                                            @RequestParam(value = "period",
+                                                    required = false,
+                                                    defaultValue = "2m") String period) {
+        return new ResponseEntity<>("boom", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/healthchecks/{name}/statistics/mean", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public HttpEntity<String> getMean(@PathVariable String name,
+                                            @RequestParam(value = "period",
+                                                    required = false,
+                                                    defaultValue = "2m") String period) {
+        return new ResponseEntity<>("boom", HttpStatus.OK);
     }
 
 
