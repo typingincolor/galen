@@ -1,8 +1,5 @@
 package info.losd.galen.repository;
 
-
-import java.util.List;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -26,7 +23,14 @@ import java.util.List;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public interface StatisticsRepo {
-    void save(Statistic s);
-    List<Api> getApis();
+public class Api {
+    private String api;
+
+    public Api(String api) {
+        this.api = api;
+    }
+
+    public String getApi() {
+        return api;
+    }
 }

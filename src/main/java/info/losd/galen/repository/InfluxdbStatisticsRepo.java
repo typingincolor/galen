@@ -2,9 +2,13 @@ package info.losd.galen.repository;
 
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Query;
+import org.influxdb.dto.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,5 +49,17 @@ public class InfluxdbStatisticsRepo implements StatisticsRepo {
                 .build();
 
         influxDB.write("galen", "default", point);
+    }
+
+    @Override
+    public List<Api> getApis() {
+        Query query = new Query("SHOW TAG VALUES FROM statistic WITH KEY = api", "galen");
+        QueryResult apiList = influxDB.query(query);
+
+        List<Api> apis = new LinkedList<>();
+
+        apiList.getResults().get(0).getSeries().get(0).getValues().forEach(value -> apis.add(new Api((String) value.get(0))));
+
+        return apis;
     }
 }

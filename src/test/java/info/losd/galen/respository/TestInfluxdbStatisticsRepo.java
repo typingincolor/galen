@@ -1,9 +1,12 @@
 package info.losd.galen.respository;
 
+import info.losd.galen.repository.Api;
 import info.losd.galen.repository.InfluxdbStatisticsRepo;
 import info.losd.galen.repository.Statistic;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Query;
+import org.influxdb.dto.QueryResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -11,13 +14,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * The MIT License (MIT)
@@ -74,5 +79,43 @@ public class TestInfluxdbStatisticsRepo {
 
         assertThat("dbname", dbname.getValue(), is(equalTo("galen")));
         assertThat("retentionPolicy", retentionPolicy.getValue(), is(equalTo("default")));
+    }
+
+    @Test
+    public void test_it_can_get_a_list_of_apis() {
+        QueryResult queryResult = new QueryResult();
+        QueryResult.Result res = new QueryResult.Result();
+        LinkedList<QueryResult.Result> resultList = new LinkedList<>();
+        QueryResult.Series series = new QueryResult.Series();
+        List<QueryResult.Series> seriesList = new LinkedList<>();
+        List<Object> values1 = new LinkedList<>();
+        List<Object> values2 = new LinkedList<>();
+        List<Object> values3 = new LinkedList<>();
+        values1.add("api1");
+        values2.add("api2");
+        values3.add("api3");
+
+        List<List<Object>> valueList = new LinkedList<>();
+        valueList.add(values1);
+        valueList.add(values2);
+        valueList.add(values3);
+        series.setValues(valueList);
+        seriesList.add(series);
+        res.setSeries(seriesList);
+        resultList.add(res);
+
+        queryResult.setResults(resultList);
+
+        ArgumentCaptor<Query> query = ArgumentCaptor.forClass(Query.class);
+        when(db.query(query.capture())).thenReturn(queryResult);
+
+        List<Api> result = repo.getApis();
+
+        assertThat(query.getValue().getCommand(), is(equalTo("SHOW TAG VALUES FROM statistic WITH KEY = api")));
+        assertThat(query.getValue().getDatabase(), is(equalTo("galen")));
+        assertThat(result.size(), is(3));
+        assertThat(result.get(0).getApi(), is(equalTo("api1")));
+        assertThat(result.get(1).getApi(), is(equalTo("api2")));
+        assertThat(result.get(2).getApi(), is(equalTo("api3")));
     }
 }
