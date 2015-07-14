@@ -1,16 +1,27 @@
 package info.losd.galen.api;
 
+import info.losd.galen.api.dto.Healthcheck;
+import info.losd.galen.api.dto.HealthcheckRequest;
+import info.losd.galen.api.dto.HealthcheckResult;
 import info.losd.galen.client.ApiClient;
 import info.losd.galen.client.ApiMethod;
-import info.losd.galen.client.ApiRequest;
-import info.losd.galen.client.ApiResponse;
+import info.losd.galen.client.dto.ApiRequest;
+import info.losd.galen.client.dto.ApiResponse;
+import info.losd.galen.repository.HealthcheckRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * The MIT License (MIT)
@@ -40,14 +51,40 @@ public class GalenApiController {
     @Autowired
     ApiClient client;
 
-    @RequestMapping(value = "/healthcheck", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    HealthcheckResult run(@RequestBody HealthcheckRequest galen) {
+    @Autowired
+    HealthcheckRepo repo;
+
+    @RequestMapping(value = "/healthchecks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public HttpEntity<HealthcheckResult> run(@RequestBody HealthcheckRequest galen) {
         ApiRequest.Header apiRequestBuilder = ApiRequest.tag(galen.getTag().getName()).url(galen.getUrl()).method(ApiMethod.valueOf(galen.getMethod()));
         galen.getHeaders().forEach((header, value) -> apiRequestBuilder.header(header, value));
         ApiResponse response = client.execute(apiRequestBuilder.build());
 
-        return HealthcheckResult.statusCode(response.getStatusCode()).build();
+        return new ResponseEntity<>(HealthcheckResult.statusCode(response.getStatusCode()).build(), HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/healthchecks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public HttpEntity<List<Healthcheck>>  getHealthcheckList() {
+        List<Healthcheck> result = new LinkedList<>();
+
+        repo.getApis().forEach(healthcheck -> {
+            Healthcheck dto = new Healthcheck(healthcheck.getName());
+            dto.add(linkTo(methodOn(GalenApiController.class).getHealtcheck(healthcheck.getName())).withSelfRel());
+
+            result.add(dto);
+        });
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/healthchecks/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public HttpEntity<String> getHealtcheck(@PathVariable String name) {
+        return new ResponseEntity<>("hello", HttpStatus.OK);
+    }
+
 
     @ExceptionHandler(IllegalArgumentException.class)
     void illegalArgumentException(HttpServletResponse response) throws IOException {

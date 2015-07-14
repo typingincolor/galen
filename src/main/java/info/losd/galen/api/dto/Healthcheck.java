@@ -1,4 +1,8 @@
-package info.losd.galen.api;
+package info.losd.galen.api.dto;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.hateoas.ResourceSupport;
 
 /**
  * The MIT License (MIT)
@@ -23,30 +27,15 @@ package info.losd.galen.api;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class HealthcheckResult {
-    private int statusCode;
+public class Healthcheck extends ResourceSupport {
+    private String name;
 
-    public int getStatusCode() {
-        return statusCode;
+    @JsonCreator
+    public Healthcheck(@JsonProperty("name") String name) {
+        this.name = name;
     }
 
-    private HealthcheckResult(int statusCode) {
-        this.statusCode = statusCode;
-    }
-
-    public static HealthcheckResult.Builder statusCode(int statusCode) {
-        return new HealthcheckResult.Builder(statusCode);
-    }
-
-    public static class Builder {
-        int statusCode;
-
-        private Builder(int statusCode) {
-            this.statusCode = statusCode;
-        }
-
-        public HealthcheckResult build() {
-            return new HealthcheckResult(statusCode);
-        }
+    public String getName() {
+        return name;
     }
 }

@@ -1,8 +1,4 @@
-package info.losd.galen.api;
-
-import info.losd.galen.repository.Healthcheck;
-
-import java.util.Map;
+package info.losd.galen.client.dto;
 
 /**
  * The MIT License (MIT)
@@ -27,41 +23,50 @@ import java.util.Map;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class HealthcheckRequest {
-    private Healthcheck tag;
-    private String url;
-    private Map<String, String> headers;
-    private String method;
+public class ApiResponse {
+    private int statusCode;
+    private String body;
 
-    public Healthcheck getTag() {
-        return tag;
+    public String getBody() {
+        return body;
     }
 
-    public void setTag(Healthcheck tag) {
-        this.tag = tag;
+    public int getStatusCode() {
+        return statusCode;
     }
 
-    public String getUrl() {
-        return url;
+    public static Body statusCode(int statusCode) {
+        return new ApiResponse.Builder(statusCode);
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    private ApiResponse(int statusCode, String body) {
+        this.statusCode = statusCode;
+        this.body = body;
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
+    public static class Builder implements Body, Build {
+        int statusCode;
+        String body;
+
+        private Builder(int statusCode) {
+            this.statusCode = statusCode;
+        }
+
+        public Build body(String body) {
+            this.body = body;
+            return this;
+        }
+
+        public ApiResponse build() {
+            return new ApiResponse(statusCode, body);
+        }
     }
 
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
+    public interface Body {
+        Build body(String body);
     }
 
-    public String getMethod() {
-        return method;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
+    public interface Build {
+        ApiResponse build();
     }
 }

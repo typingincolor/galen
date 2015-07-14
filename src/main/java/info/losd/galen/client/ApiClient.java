@@ -1,6 +1,8 @@
 package info.losd.galen.client;
 
-import info.losd.galen.repository.HealthcheckDetails;
+import info.losd.galen.client.dto.ApiRequest;
+import info.losd.galen.client.dto.ApiResponse;
+import info.losd.galen.repository.dto.HealthcheckDetails;
 import info.losd.galen.repository.HealthcheckRepo;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;

@@ -40,6 +40,7 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
+    compile 'org.springframework.hateoas:spring-hateoas:0.17.0.RELEASE'
 
     testCompile 'junit:junit:4.12'
     testCompile 'com.github.tomakehurst:wiremock:1.56'

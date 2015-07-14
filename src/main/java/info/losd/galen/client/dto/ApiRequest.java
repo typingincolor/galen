@@ -1,4 +1,6 @@
-package info.losd.galen.client;
+package info.losd.galen.client.dto;
+
+import info.losd.galen.client.ApiMethod;
 
 import java.util.HashMap;
 import java.util.Map;

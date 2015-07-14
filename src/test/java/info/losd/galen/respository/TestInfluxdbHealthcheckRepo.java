@@ -1,8 +1,8 @@
 package info.losd.galen.respository;
 
-import info.losd.galen.repository.Healthcheck;
+import info.losd.galen.repository.dto.Healthcheck;
 import info.losd.galen.repository.InfluxdbHealthcheckRepo;
-import info.losd.galen.repository.HealthcheckDetails;
+import info.losd.galen.repository.dto.HealthcheckDetails;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;

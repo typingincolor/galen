@@ -1,4 +1,4 @@
-package info.losd.galen.repository;
+package info.losd.galen.repository.dto;
 
 /**
  * The MIT License (MIT)

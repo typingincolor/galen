@@ -2,10 +2,15 @@ package info.losd.galen.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import info.losd.galen.api.dto.Healthcheck;
+import info.losd.galen.api.dto.HealthcheckResult;
 import info.losd.galen.client.ApiClient;
 import info.losd.galen.client.ApiMethod;
-import info.losd.galen.client.ApiRequest;
-import info.losd.galen.client.ApiResponse;
+import info.losd.galen.client.dto.ApiRequest;
+import info.losd.galen.client.dto.ApiResponse;
+import info.losd.galen.repository.HealthcheckRepo;
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,10 +24,15 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import java.lang.reflect.Type;
+import java.util.LinkedList;
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,6 +66,9 @@ public class TestApi {
     @Mock
     private ApiClient client;
 
+    @Mock
+    private HealthcheckRepo repo;
+
     @InjectMocks
     private GalenApiController apiController;
 
@@ -78,7 +91,7 @@ public class TestApi {
 
         when(client.execute(argumentCaptor.capture())).thenReturn(response);
 
-        MvcResult mvcResult = mockMvc.perform(post("/healthcheck").contentType(MediaType.APPLICATION_JSON).content(json))
+        MvcResult mvcResult = mockMvc.perform(post("/healthchecks").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -97,12 +110,39 @@ public class TestApi {
     public void it_handles_an_unknown_method() throws Exception {
         String json = "{\"tag\":\"test_api\",\"url\":\"http://localhost:9090/test\", \"method\": \"JUNK\",\"headers\": {\"header1\": \"value1\"}}";
 
-        MvcResult mvcResult = mockMvc.perform(post("/healthcheck").contentType(MediaType.APPLICATION_JSON).content(json))
+        MvcResult mvcResult = mockMvc.perform(post("/healthchecks").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         assertThat(mvcResult.getResponse().getErrorMessage(),
                 is(equalTo("The method specified is invalid")));
+    }
+
+    @Test
+    public void it_gets_a_list_of_healthchecks() throws Exception {
+        List<info.losd.galen.repository.dto.Healthcheck> healthcheckList = new LinkedList<>();
+        healthcheckList.add(new info.losd.galen.repository.dto.Healthcheck("healthcheck1"));
+        healthcheckList.add(new info.losd.galen.repository.dto.Healthcheck("healthcheck2"));
+        healthcheckList.add(new info.losd.galen.repository.dto.Healthcheck("healthcheck3"));
+
+        when(repo.getApis()).thenReturn(healthcheckList);
+
+        MvcResult mvcResult = mockMvc.perform(get("/healthchecks"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        Type type = new TypeToken<List<Healthcheck>>() {}.getType();
+
+        List<Healthcheck> result = gson.fromJson(mvcResult.getResponse().getContentAsString(), type);
+
+        assertThat(result, is(IsCollectionWithSize.hasSize(3)));
+        assertThat(result.get(0).getName(), is(equalTo("healthcheck1")));
+        assertThat(result.get(0).getLink("self").toString(), is(equalTo("<http://localhost/healthchecks/healthcheck1>;rel=\"self\"")));
+        assertThat(result.get(1).getName(), is(equalTo("healthcheck2")));
+        assertThat(result.get(1).getLink("self").toString(), is(equalTo("<http://localhost/healthchecks/healthcheck2>;rel=\"self\"")));
+        assertThat(result.get(2).getName(), is(equalTo("healthcheck3")));
+        assertThat(result.get(2).getLink("self").toString(), is(equalTo("<http://localhost/healthchecks/healthcheck3>;rel=\"self\"")));
     }
 }

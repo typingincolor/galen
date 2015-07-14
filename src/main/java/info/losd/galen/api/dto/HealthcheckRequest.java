@@ -1,10 +1,8 @@
-package info.losd.galen.repository;
-
+package info.losd.galen.api.dto;
 
 import info.losd.galen.repository.dto.Healthcheck;
-import info.losd.galen.repository.dto.HealthcheckDetails;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * The MIT License (MIT)
@@ -29,7 +27,41 @@ import java.util.List;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public interface HealthcheckRepo {
-    void save(HealthcheckDetails s);
-    List<Healthcheck> getApis();
+public class HealthcheckRequest {
+    private Healthcheck tag;
+    private String url;
+    private Map<String, String> headers;
+    private String method;
+
+    public Healthcheck getTag() {
+        return tag;
+    }
+
+    public void setTag(Healthcheck tag) {
+        this.tag = tag;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
 }

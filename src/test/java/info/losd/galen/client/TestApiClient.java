@@ -2,7 +2,9 @@ package info.losd.galen.client;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import info.losd.galen.repository.HealthcheckDetails;
+import info.losd.galen.client.dto.ApiRequest;
+import info.losd.galen.client.dto.ApiResponse;
+import info.losd.galen.repository.dto.HealthcheckDetails;
 import info.losd.galen.repository.HealthcheckRepo;
 import org.junit.Before;
 import org.junit.Rule;

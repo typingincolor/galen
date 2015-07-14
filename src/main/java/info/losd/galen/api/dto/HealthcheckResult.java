@@ -1,4 +1,4 @@
-package info.losd.galen.client;
+package info.losd.galen.api.dto;
 
 /**
  * The MIT License (MIT)
@@ -23,50 +23,30 @@ package info.losd.galen.client;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class ApiResponse {
+public class HealthcheckResult {
     private int statusCode;
-    private String body;
-
-    public String getBody() {
-        return body;
-    }
 
     public int getStatusCode() {
         return statusCode;
     }
 
-    public static Body statusCode(int statusCode) {
-        return new ApiResponse.Builder(statusCode);
-    }
-
-    private ApiResponse(int statusCode, String body) {
+    private HealthcheckResult(int statusCode) {
         this.statusCode = statusCode;
-        this.body = body;
     }
 
-    public static class Builder implements Body, Build {
+    public static HealthcheckResult.Builder statusCode(int statusCode) {
+        return new HealthcheckResult.Builder(statusCode);
+    }
+
+    public static class Builder {
         int statusCode;
-        String body;
 
         private Builder(int statusCode) {
             this.statusCode = statusCode;
         }
 
-        public Build body(String body) {
-            this.body = body;
-            return this;
+        public HealthcheckResult build() {
+            return new HealthcheckResult(statusCode);
         }
-
-        public ApiResponse build() {
-            return new ApiResponse(statusCode, body);
-        }
-    }
-
-    public interface Body {
-        Build body(String body);
-    }
-
-    public interface Build {
-        ApiResponse build();
     }
 }
