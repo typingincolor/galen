@@ -2,8 +2,8 @@ package info.losd.galen.client;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import info.losd.galen.repository.Statistic;
-import info.losd.galen.repository.StatisticsRepo;
+import info.losd.galen.repository.HealthcheckDetails;
+import info.losd.galen.repository.HealthcheckRepo;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class TestApiClient {
     public WireMockRule wireMockRule = new WireMockRule();
 
     @Mock
-    private StatisticsRepo statisticsRepo;
+    private HealthcheckRepo healthcheckRepo;
 
     @InjectMocks
     ApiClient client;
@@ -114,7 +114,7 @@ public class TestApiClient {
     }
 
     private void run(ApiRequest request) {
-        ArgumentCaptor<Statistic> argumentCaptor = ArgumentCaptor.forClass(Statistic.class);
+        ArgumentCaptor<HealthcheckDetails> argumentCaptor = ArgumentCaptor.forClass(HealthcheckDetails.class);
 
 
         ApiResponse result = client.execute(request);
@@ -122,9 +122,9 @@ public class TestApiClient {
         assertThat("statusCode code", result.getStatusCode(), is(200));
         assertThat("body", result.getBody(), is(equalTo("Test")));
 
-        verify(statisticsRepo, times(1)).save(argumentCaptor.capture());
+        verify(healthcheckRepo, times(1)).save(argumentCaptor.capture());
         assertThat(argumentCaptor.getValue().getDuration(), is(greaterThan(0L)));
         assertThat(argumentCaptor.getValue().getStatusCode(), is(200));
-        assertThat(argumentCaptor.getValue().getTag(), is(equalTo("test_api")));
+        assertThat(argumentCaptor.getValue().getHealthcheck().getName(), is(equalTo("test_api")));
     }
 }

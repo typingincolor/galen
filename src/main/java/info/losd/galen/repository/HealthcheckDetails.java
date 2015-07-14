@@ -23,13 +23,13 @@ package info.losd.galen.repository;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class Statistic {
+public class HealthcheckDetails {
     private long duration;
     private int statusCode;
-    private String tag;
+    private Healthcheck healthcheck;
 
-    private Statistic(String tag, long duration, int statusCode) {
-        this.tag = tag;
+    private HealthcheckDetails(Healthcheck healthcheck, long duration, int statusCode) {
+        this.healthcheck = healthcheck;
         this.duration = duration;
         this.statusCode = statusCode;
     }
@@ -42,21 +42,21 @@ public class Statistic {
         return statusCode;
     }
 
-    public String getTag() {
-        return tag;
+    public Healthcheck getHealthcheck() {
+        return healthcheck;
     }
 
-    public static Statistic.Duration tag(String name) {
-        return new Statistic.Builder(name);
+    public static HealthcheckDetails.Duration tag(String name) {
+        return new HealthcheckDetails.Builder(name);
     }
 
     public static class Builder implements Duration, StatusCode, Build {
         private long duration;
         private int statusCode;
-        private String tag;
+        private Healthcheck healthcheck;
 
         private Builder(String tag) {
-            this.tag = tag;
+            this.healthcheck = new Healthcheck(tag);
         }
 
         public StatusCode duration(long duration) {
@@ -69,8 +69,8 @@ public class Statistic {
             return this;
         }
 
-        public Statistic build() {
-            return new Statistic(tag, duration, statusCode);
+        public HealthcheckDetails build() {
+            return new HealthcheckDetails(healthcheck, duration, statusCode);
         }
     }
 
@@ -83,6 +83,6 @@ public class Statistic {
     }
 
     public interface Build {
-        Statistic build();
+        HealthcheckDetails build();
     }
 }

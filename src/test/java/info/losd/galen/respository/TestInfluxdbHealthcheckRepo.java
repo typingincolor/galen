@@ -1,8 +1,8 @@
 package info.losd.galen.respository;
 
-import info.losd.galen.repository.Api;
-import info.losd.galen.repository.InfluxdbStatisticsRepo;
-import info.losd.galen.repository.Statistic;
+import info.losd.galen.repository.Healthcheck;
+import info.losd.galen.repository.InfluxdbHealthcheckRepo;
+import info.losd.galen.repository.HealthcheckDetails;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
@@ -47,12 +47,12 @@ import static org.mockito.Mockito.*;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class TestInfluxdbStatisticsRepo {
+public class TestInfluxdbHealthcheckRepo {
     @Mock
     private InfluxDB db;
 
     @InjectMocks
-    InfluxdbStatisticsRepo repo;
+    InfluxdbHealthcheckRepo repo;
 
     @Before
     public void setup() {
@@ -61,7 +61,7 @@ public class TestInfluxdbStatisticsRepo {
 
     @Test
     public void test_it_writes_to_influxdb() {
-        Statistic stat = Statistic.tag("api_name").duration(100L).statusCode(200).build();
+        HealthcheckDetails stat = HealthcheckDetails.tag("api_name").duration(100L).statusCode(200).build();
 
         repo.save(stat);
 
@@ -109,13 +109,13 @@ public class TestInfluxdbStatisticsRepo {
         ArgumentCaptor<Query> query = ArgumentCaptor.forClass(Query.class);
         when(db.query(query.capture())).thenReturn(queryResult);
 
-        List<Api> result = repo.getApis();
+        List<Healthcheck> result = repo.getApis();
 
         assertThat(query.getValue().getCommand(), is(equalTo("SHOW TAG VALUES FROM statistic WITH KEY = api")));
         assertThat(query.getValue().getDatabase(), is(equalTo("galen")));
         assertThat(result.size(), is(3));
-        assertThat(result.get(0).getApi(), is(equalTo("api1")));
-        assertThat(result.get(1).getApi(), is(equalTo("api2")));
-        assertThat(result.get(2).getApi(), is(equalTo("api3")));
+        assertThat(result.get(0).getName(), is(equalTo("api1")));
+        assertThat(result.get(1).getName(), is(equalTo("api2")));
+        assertThat(result.get(2).getName(), is(equalTo("api3")));
     }
 }

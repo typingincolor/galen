@@ -1,4 +1,7 @@
-package info.losd.galen.api;
+package info.losd.galen.repository;
+
+
+import java.util.List;
 
 /**
  * The MIT License (MIT)
@@ -23,30 +26,7 @@ package info.losd.galen.api;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class GalenResult {
-    private int statusCode;
-
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    private GalenResult(int statusCode) {
-        this.statusCode = statusCode;
-    }
-
-    public static GalenResult.Builder statusCode(int statusCode) {
-        return new GalenResult.Builder(statusCode);
-    }
-
-    public static class Builder {
-        int statusCode;
-
-        private Builder(int statusCode) {
-            this.statusCode = statusCode;
-        }
-
-        public GalenResult build() {
-            return new GalenResult(statusCode);
-        }
-    }
+public interface HealthcheckRepo {
+    void save(HealthcheckDetails s);
+    List<Healthcheck> getApis();
 }

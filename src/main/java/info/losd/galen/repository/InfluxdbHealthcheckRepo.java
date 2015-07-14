@@ -35,15 +35,15 @@ import java.util.concurrent.TimeUnit;
  * THE SOFTWARE.
  */
 @Repository
-public class InfluxdbStatisticsRepo implements StatisticsRepo {
+public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
     @Autowired
     InfluxDB influxDB;
 
     @Override
-    public void save(Statistic s) {
+    public void save(HealthcheckDetails s) {
         Point point = Point.measurement("statistic")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .tag("api", s.getTag())
+                .tag("api", s.getHealthcheck().getName())
                 .field("response_time", s.getDuration())
                 .field("status_code", s.getStatusCode())
                 .build();
@@ -52,14 +52,14 @@ public class InfluxdbStatisticsRepo implements StatisticsRepo {
     }
 
     @Override
-    public List<Api> getApis() {
+    public List<Healthcheck> getApis() {
         Query query = new Query("SHOW TAG VALUES FROM statistic WITH KEY = api", "galen");
         QueryResult apiList = influxDB.query(query);
 
-        List<Api> apis = new LinkedList<>();
+        List<Healthcheck> healthchecks = new LinkedList<>();
 
-        apiList.getResults().get(0).getSeries().get(0).getValues().forEach(value -> apis.add(new Api((String) value.get(0))));
+        apiList.getResults().get(0).getSeries().get(0).getValues().forEach(value -> healthchecks.add(new Healthcheck((String) value.get(0))));
 
-        return apis;
+        return healthchecks;
     }
 }

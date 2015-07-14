@@ -78,12 +78,12 @@ public class TestApi {
 
         when(client.execute(argumentCaptor.capture())).thenReturn(response);
 
-        MvcResult mvcResult = mockMvc.perform(post("/run").contentType(MediaType.APPLICATION_JSON).content(json))
+        MvcResult mvcResult = mockMvc.perform(post("/healthcheck").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        GalenResult result = gson.fromJson(mvcResult.getResponse().getContentAsString(), GalenResult.class);
+        HealthcheckResult result = gson.fromJson(mvcResult.getResponse().getContentAsString(), HealthcheckResult.class);
         assertThat(result.getStatusCode(), is(200));
 
         ApiRequest captured = argumentCaptor.getValue();
@@ -97,7 +97,7 @@ public class TestApi {
     public void it_handles_an_unknown_method() throws Exception {
         String json = "{\"tag\":\"test_api\",\"url\":\"http://localhost:9090/test\", \"method\": \"JUNK\",\"headers\": {\"header1\": \"value1\"}}";
 
-        MvcResult mvcResult = mockMvc.perform(post("/run").contentType(MediaType.APPLICATION_JSON).content(json))
+        MvcResult mvcResult = mockMvc.perform(post("/healthcheck").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

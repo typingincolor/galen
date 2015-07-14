@@ -40,13 +40,13 @@ public class GalenApiController {
     @Autowired
     ApiClient client;
 
-    @RequestMapping(value = "/run", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    GalenResult run(@RequestBody GalenRequest galen) {
-        ApiRequest.Header apiRequestBuilder = ApiRequest.tag(galen.getTag()).url(galen.getUrl()).method(ApiMethod.valueOf(galen.getMethod()));
+    @RequestMapping(value = "/healthcheck", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    HealthcheckResult run(@RequestBody HealthcheckRequest galen) {
+        ApiRequest.Header apiRequestBuilder = ApiRequest.tag(galen.getTag().getName()).url(galen.getUrl()).method(ApiMethod.valueOf(galen.getMethod()));
         galen.getHeaders().forEach((header, value) -> apiRequestBuilder.header(header, value));
         ApiResponse response = client.execute(apiRequestBuilder.build());
 
-        return GalenResult.statusCode(response.getStatusCode()).build();
+        return HealthcheckResult.statusCode(response.getStatusCode()).build();
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

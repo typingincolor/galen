@@ -1,7 +1,7 @@
 package info.losd.galen.client;
 
-import info.losd.galen.repository.Statistic;
-import info.losd.galen.repository.StatisticsRepo;
+import info.losd.galen.repository.HealthcheckDetails;
+import info.losd.galen.repository.HealthcheckRepo;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -41,7 +41,7 @@ public class ApiClient {
     Logger logger = LoggerFactory.getLogger(ApiClient.class);
 
     @Autowired
-    StatisticsRepo statisticsRepo;
+    HealthcheckRepo healthcheckRepo;
 
     public ApiResponse execute(ApiRequest req) {
         try {
@@ -53,11 +53,11 @@ public class ApiClient {
             HttpResponse response = request.execute().returnResponse();
             long end = System.nanoTime();
 
-            Statistic stat = Statistic.tag(req.getTag())
+            HealthcheckDetails stat = HealthcheckDetails.tag(req.getTag())
                     .duration((end - start) / 1000000)
                     .statusCode(response.getStatusLine().getStatusCode())
                     .build();
-            statisticsRepo.save(stat);
+            healthcheckRepo.save(stat);
 
             return ApiResponse
                     .statusCode(response.getStatusLine().getStatusCode())
