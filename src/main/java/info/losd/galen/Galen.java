@@ -3,7 +3,6 @@ package info.losd.galen;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -31,7 +30,7 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @SpringBootApplication
 @ComponentScan
-@EnableAutoConfiguration(exclude = {JacksonAutoConfiguration.class})
+@EnableAutoConfiguration
 public class Galen {
     public static void main(String[] args) {
         SpringApplication.run(Galen.class, args);
