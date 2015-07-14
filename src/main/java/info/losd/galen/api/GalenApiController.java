@@ -66,7 +66,7 @@ public class GalenApiController {
 
     @RequestMapping(value = "/healthchecks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public HttpEntity<List<Healthcheck>>  getHealthcheckList() {
+    public HttpEntity<List<Healthcheck>> getHealthcheckList() {
         List<Healthcheck> result = new LinkedList<>();
 
         repo.getApis().forEach(healthcheck -> {

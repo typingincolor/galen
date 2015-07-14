@@ -133,7 +133,8 @@ public class TestApi {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        Type type = new TypeToken<List<Healthcheck>>() {}.getType();
+        Type type = new TypeToken<List<Healthcheck>>() {
+        }.getType();
 
         List<Healthcheck> result = gson.fromJson(mvcResult.getResponse().getContentAsString(), type);
 

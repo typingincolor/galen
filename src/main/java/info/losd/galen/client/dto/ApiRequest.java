@@ -101,6 +101,7 @@ public class ApiRequest {
 
     public interface Header {
         Header header(String header, String value);
+
         ApiRequest build();
     }
 

@@ -2,8 +2,8 @@ package info.losd.galen.client;
 
 import info.losd.galen.client.dto.ApiRequest;
 import info.losd.galen.client.dto.ApiResponse;
-import info.losd.galen.repository.dto.HealthcheckDetails;
 import info.losd.galen.repository.HealthcheckRepo;
+import info.losd.galen.repository.dto.HealthcheckDetails;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -64,16 +64,14 @@ public class ApiClient {
             return ApiResponse
                     .statusCode(response.getStatusLine().getStatusCode())
                     .body(getResponseBody(response)).build();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.error("IO Exception", e);
             throw new RuntimeException(e);
         }
     }
 
     private String getResponseBody(HttpResponse response) throws
-            IOException
-    {
+            IOException {
         StringWriter writer = new StringWriter();
         IOUtils.copy(response.getEntity().getContent(), writer);
         return writer.toString();

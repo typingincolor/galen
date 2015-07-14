@@ -31,5 +31,6 @@ import java.util.List;
  */
 public interface HealthcheckRepo {
     void save(HealthcheckDetails s);
+
     List<Healthcheck> getApis();
 }
