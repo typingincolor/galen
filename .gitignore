@@ -5,3 +5,6 @@ build
 .env
 
 bin
+.classpath
+.settings
+.project
