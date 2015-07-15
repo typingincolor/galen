@@ -1,5 +1,6 @@
 package info.losd.galen.repository;
 
+import info.losd.galen.configuration.InfluxDbName;
 import info.losd.galen.repository.dto.Healthcheck;
 import info.losd.galen.repository.dto.HealthcheckDetails;
 import info.losd.galen.repository.dto.HealthcheckMean;
@@ -11,7 +12,6 @@ import org.influxdb.dto.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
@@ -47,8 +47,8 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
     @Autowired
     InfluxDB influxDB;
 
-    @Value("${galen.influxdb.dbname}")
-    private String dbname = "galen";
+    @Autowired
+    InfluxDbName db;
 
     private Logger logger = LoggerFactory.getLogger(InfluxdbHealthcheckRepo.class);
 
@@ -61,12 +61,12 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
                 .field("status_code", s.getStatusCode())
                 .build();
 
-        influxDB.write(dbname, "default", point);
+        influxDB.write(db.getName(), "default", point);
     }
 
     @Override
     public List<Healthcheck> getHealthchecks() {
-        Query query = new Query("SHOW TAG VALUES FROM statistic WITH KEY = healthcheck", dbname);
+        Query query = new Query("SHOW TAG VALUES FROM statistic WITH KEY = healthcheck", db.getName());
         QueryResult apiList = influxDB.query(query);
 
         List<Healthcheck> healthchecks = new LinkedList<>();
@@ -88,7 +88,7 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
                 , period.toString()
                 , healthcheck);
 
-        Query query = new Query(queryString, dbname);
+        Query query = new Query(queryString, db.getName());
         QueryResult healthcheckLost = influxDB.query(query);
 
         List<HealthcheckStatistic> statistics = new LinkedList<>();
@@ -111,7 +111,7 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
                 , period.toString()
                 , healthcheck);
 
-        Query query = new Query(queryString, dbname);
+        Query query = new Query(queryString, db.getName());
         QueryResult healthcheckLost = influxDB.query(query);
 
         try {

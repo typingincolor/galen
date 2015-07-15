@@ -1,4 +1,4 @@
 galen:
     influxdb:
         url: http://localhost:8086
-        dbname: galen
+        name: galen

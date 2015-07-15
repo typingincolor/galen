@@ -1,5 +1,6 @@
 package info.losd.galen.respository;
 
+import info.losd.galen.configuration.InfluxDbName;
 import info.losd.galen.repository.InfluxdbHealthcheckRepo;
 import info.losd.galen.repository.Period;
 import info.losd.galen.repository.dto.Healthcheck;
@@ -58,12 +59,16 @@ public class TestInfluxdbHealthcheckRepo {
     @Mock
     private InfluxDB db;
 
+    @Mock
+    private InfluxDbName dbname;
+
     @InjectMocks
     InfluxdbHealthcheckRepo repo;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
+        when(dbname.getName()).thenReturn("galen-web");
     }
 
     @Test
@@ -84,7 +89,7 @@ public class TestInfluxdbHealthcheckRepo {
                         containsString("tags={healthcheck=healthcheck1}")
                 ));
 
-        assertThat("dbname", dbname.getValue(), is(equalTo("galen")));
+        assertThat("dbname", dbname.getValue(), is(equalTo("galen-web")));
         assertThat("retentionPolicy", retentionPolicy.getValue(), is(equalTo("default")));
     }
 
@@ -102,7 +107,7 @@ public class TestInfluxdbHealthcheckRepo {
         List<Healthcheck> result = repo.getHealthchecks();
 
         assertThat(query.getValue().getCommand(), is(equalTo("SHOW TAG VALUES FROM statistic WITH KEY = healthcheck")));
-        assertThat(query.getValue().getDatabase(), is(equalTo("galen")));
+        assertThat(query.getValue().getDatabase(), is(equalTo("galen-web")));
         assertThat(result, IsCollectionWithSize.hasSize(3));
         assertThat(result.get(0).getName(), is(equalTo("api1")));
         assertThat(result.get(1).getName(), is(equalTo("api2")));
@@ -134,7 +139,7 @@ public class TestInfluxdbHealthcheckRepo {
         List<HealthcheckStatistic> result = repo.getStatisticsForPeriod("healthcheck1", Period.TWO_MINUTES);
 
         assertThat(query.getValue().getCommand(), is(equalTo("SELECT time, response_time, status_code FROM statistic WHERE time > now() - 2m AND healthcheck = 'healthcheck1'")));
-        assertThat(query.getValue().getDatabase(), is(equalTo("galen")));
+        assertThat(query.getValue().getDatabase(), is(equalTo("galen-web")));
         assertThat(result, IsCollectionWithSize.hasSize(3));
 
         assertThat(result.get(0), is(equalTo(new HealthcheckStatistic("2015-07-13T07:51:25.165Z", 937, 200))));
@@ -154,7 +159,7 @@ public class TestInfluxdbHealthcheckRepo {
         HealthcheckMean result = repo.getMeanForPeriod("healthcheck1", Period.TWO_MINUTES);
 
         assertThat(query.getValue().getCommand(), is(equalTo("SELECT mean(response_time) FROM statistic WHERE time > now() - 2m AND healthcheck = 'healthcheck1'")));
-        assertThat(query.getValue().getDatabase(), is(equalTo("galen")));
+        assertThat(query.getValue().getDatabase(), is(equalTo("galen-web")));
 
         assertThat(result.getTimestamp(), is(equalTo(Instant.parse("2015-07-12T00:00:00.05138052Z"))));
         assertThat(result.getMean(), is(equalTo(227.22135161606295)));
