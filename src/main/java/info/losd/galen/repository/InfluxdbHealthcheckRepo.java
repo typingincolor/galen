@@ -8,9 +8,12 @@ import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +46,8 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
     @Autowired
     InfluxDB influxDB;
 
+    private Logger logger = LoggerFactory.getLogger(InfluxdbHealthcheckRepo.class);
+
     @Override
     public void save(HealthcheckDetails s) {
         Point point = Point.measurement("statistic")
@@ -56,13 +61,19 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
     }
 
     @Override
-    public List<Healthcheck> getApis() {
-        Query query = new Query("SHOW TAG VALUES FROM statistic WITH KEY = api", "galen");
+    public List<Healthcheck> getHealthchecks() {
+        Query query = new Query("SHOW TAG VALUES FROM statistic WITH KEY = healthcheck", "galen");
         QueryResult apiList = influxDB.query(query);
 
         List<Healthcheck> healthchecks = new LinkedList<>();
 
-        apiList.getResults().get(0).getSeries().get(0).getValues().forEach(value -> healthchecks.add(new Healthcheck((String) value.get(0))));
+        try {
+            apiList.getResults().get(0).getSeries().get(0).getValues().forEach(value -> healthchecks.add(new Healthcheck((String) value.get(0))));
+        }
+        catch (Exception e) {
+            logger.info("Returning empty list of health checks {}", e.getMessage());
+            return Collections.<Healthcheck>emptyList();
+        }
 
         return healthchecks;
     }

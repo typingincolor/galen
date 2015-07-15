@@ -34,7 +34,7 @@ import java.util.List;
 public interface HealthcheckRepo {
     void save(HealthcheckDetails s);
 
-    List<Healthcheck> getApis();
+    List<Healthcheck> getHealthchecks();
 
     List<HealthcheckStatistic> getStatisticsForPeriod(String healthcheck, Period period);
 

@@ -66,7 +66,7 @@ public class GalenApiController {
     public HttpEntity<List<Healthcheck>> getHealthcheckList() {
         List<Healthcheck> result = new LinkedList<>();
 
-        repo.getApis().forEach(healthcheck -> {
+        repo.getHealthchecks().forEach(healthcheck -> {
             result.add(new Healthcheck(healthcheck.getName()));
         });
 

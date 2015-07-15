@@ -89,7 +89,7 @@ public class TestInfluxdbHealthcheckRepo {
     }
 
     @Test
-    public void test_it_can_get_a_list_of_apis() {
+    public void test_it_can_get_a_list_of_healthchecks() {
         List<Object> api1 = new LinkedList<>(Collections.singletonList("api1"));
         List<Object> api2 = new LinkedList<>(Collections.singletonList("api2"));
         List<Object> api3 = new LinkedList<>(Collections.singletonList("api3"));
@@ -99,14 +99,25 @@ public class TestInfluxdbHealthcheckRepo {
         ArgumentCaptor<Query> query = ArgumentCaptor.forClass(Query.class);
         when(db.query(query.capture())).thenReturn(queryResult);
 
-        List<Healthcheck> result = repo.getApis();
+        List<Healthcheck> result = repo.getHealthchecks();
 
-        assertThat(query.getValue().getCommand(), is(equalTo("SHOW TAG VALUES FROM statistic WITH KEY = api")));
+        assertThat(query.getValue().getCommand(), is(equalTo("SHOW TAG VALUES FROM statistic WITH KEY = healthcheck")));
         assertThat(query.getValue().getDatabase(), is(equalTo("galen")));
         assertThat(result, IsCollectionWithSize.hasSize(3));
         assertThat(result.get(0).getName(), is(equalTo("api1")));
         assertThat(result.get(1).getName(), is(equalTo("api2")));
         assertThat(result.get(2).getName(), is(equalTo("api3")));
+    }
+
+    @Test
+    public void test_it_handles_an_empty_list_of_healthchecks() {
+        QueryResult queryResult = buildQueryResult(Collections.emptyList());
+
+        ArgumentCaptor<Query> query = ArgumentCaptor.forClass(Query.class);
+        when(db.query(query.capture())).thenReturn(queryResult);
+
+        List<Healthcheck> result = repo.getHealthchecks(); buildQueryResult(Collections.emptyList());
+        assertThat(result, IsCollectionWithSize.hasSize(0));
     }
 
     @Test

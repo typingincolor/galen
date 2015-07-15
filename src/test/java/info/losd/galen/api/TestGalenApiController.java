@@ -126,7 +126,7 @@ public class TestGalenApiController {
         healthcheckList.add(new info.losd.galen.repository.dto.Healthcheck("healthcheck2"));
         healthcheckList.add(new info.losd.galen.repository.dto.Healthcheck("healthcheck3"));
 
-        when(repo.getApis()).thenReturn(healthcheckList);
+        when(repo.getHealthchecks()).thenReturn(healthcheckList);
 
         MvcResult mvcResult = mockMvc.perform(get("/healthchecks"))
                 .andExpect(status().isOk())
