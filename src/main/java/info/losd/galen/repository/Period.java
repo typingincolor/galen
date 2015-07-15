@@ -1,12 +1,5 @@
 package info.losd.galen.repository;
 
-
-import info.losd.galen.repository.dto.Healthcheck;
-import info.losd.galen.repository.dto.HealthcheckDetails;
-import info.losd.galen.repository.dto.HealthcheckStatistic;
-
-import java.util.List;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -30,9 +23,17 @@ import java.util.List;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public interface HealthcheckRepo {
-    void save(HealthcheckDetails s);
+public enum Period {
+    TWO_MINUTES("2m");
 
-    List<Healthcheck> getApis();
-    List<HealthcheckStatistic> getStatisticsForPeriod(String healthcheck, Period period);
+    private final String text;
+
+    private Period(final String text) {
+        this.text = text;
+    }
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }

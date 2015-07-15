@@ -1,8 +1,11 @@
 package info.losd.galen.respository;
 
 import info.losd.galen.repository.InfluxdbHealthcheckRepo;
+import info.losd.galen.repository.Period;
 import info.losd.galen.repository.dto.Healthcheck;
 import info.losd.galen.repository.dto.HealthcheckDetails;
+import info.losd.galen.repository.dto.HealthcheckStatistic;
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
@@ -14,11 +17,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.comparesEqualTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
@@ -61,7 +66,7 @@ public class TestInfluxdbHealthcheckRepo {
 
     @Test
     public void test_it_writes_to_influxdb() {
-        HealthcheckDetails stat = HealthcheckDetails.tag("api_name").duration(100L).statusCode(200).build();
+        HealthcheckDetails stat = HealthcheckDetails.tag("healthcheck1").duration(100L).statusCode(200).build();
 
         repo.save(stat);
 
@@ -74,7 +79,7 @@ public class TestInfluxdbHealthcheckRepo {
                 allOf(containsString("fields={response_time=100, status_code=200}"),
                         containsString("name=statistic"),
                         containsString("precision=MILLISECONDS"),
-                        containsString("tags={api=api_name}")
+                        containsString("tags={healthcheck=healthcheck1}")
                 ));
 
         assertThat("dbname", dbname.getValue(), is(equalTo("galen")));
@@ -83,28 +88,11 @@ public class TestInfluxdbHealthcheckRepo {
 
     @Test
     public void test_it_can_get_a_list_of_apis() {
-        QueryResult queryResult = new QueryResult();
-        QueryResult.Result res = new QueryResult.Result();
-        LinkedList<QueryResult.Result> resultList = new LinkedList<>();
-        QueryResult.Series series = new QueryResult.Series();
-        List<QueryResult.Series> seriesList = new LinkedList<>();
-        List<Object> values1 = new LinkedList<>();
-        List<Object> values2 = new LinkedList<>();
-        List<Object> values3 = new LinkedList<>();
-        values1.add("api1");
-        values2.add("api2");
-        values3.add("api3");
+        List<Object> api1 = new LinkedList<>(Arrays.asList("api1"));
+        List<Object> api2 = new LinkedList<>(Arrays.asList("api2"));
+        List<Object> api3 = new LinkedList<>(Arrays.asList("api3"));
 
-        List<List<Object>> valueList = new LinkedList<>();
-        valueList.add(values1);
-        valueList.add(values2);
-        valueList.add(values3);
-        series.setValues(valueList);
-        seriesList.add(series);
-        res.setSeries(seriesList);
-        resultList.add(res);
-
-        queryResult.setResults(resultList);
+        QueryResult queryResult = buildQueryResult(api1, api2, api3);
 
         ArgumentCaptor<Query> query = ArgumentCaptor.forClass(Query.class);
         when(db.query(query.capture())).thenReturn(queryResult);
@@ -113,9 +101,53 @@ public class TestInfluxdbHealthcheckRepo {
 
         assertThat(query.getValue().getCommand(), is(equalTo("SHOW TAG VALUES FROM statistic WITH KEY = api")));
         assertThat(query.getValue().getDatabase(), is(equalTo("galen")));
-        assertThat(result.size(), is(3));
+        assertThat(result, IsCollectionWithSize.hasSize(3));
         assertThat(result.get(0).getName(), is(equalTo("api1")));
         assertThat(result.get(1).getName(), is(equalTo("api2")));
         assertThat(result.get(2).getName(), is(equalTo("api3")));
+    }
+
+    @Test
+    public void test_it_can_get_statistics_for_a_period() throws Exception {
+        List<Object> statistic1 = new LinkedList<>(Arrays.asList("2015-07-13T07:51:25.165Z", 937, 200));
+        List<Object> statistic2 = new LinkedList<>(Arrays.asList("2015-07-13T07:51:32.358Z", 192, 500));
+        List<Object> statistic3 = new LinkedList<>(Arrays.asList("2015-07-13T07:51:33.426Z", 185, 200));
+
+        QueryResult queryResult = buildQueryResult(statistic1, statistic2, statistic3);
+
+        ArgumentCaptor<Query> query = ArgumentCaptor.forClass(Query.class);
+        when(db.query(query.capture())).thenReturn(queryResult);
+
+        List<HealthcheckStatistic> result = repo.getStatisticsForPeriod("healthcheck1", Period.TWO_MINUTES);
+
+        assertThat(query.getValue().getCommand(), is(equalTo("SELECT time, response_time, status_code FROM statistic WHERE time > now() - 2m AND healthcheck = 'healthcheck1'")));
+        assertThat(query.getValue().getDatabase(), is(equalTo("galen")));
+        assertThat(result, IsCollectionWithSize.hasSize(3));
+
+        assertThat(result.get(0), comparesEqualTo(new HealthcheckStatistic("2015-07-13T07:51:25.165Z", 937, 200)));
+        assertThat(result.get(1), comparesEqualTo(new HealthcheckStatistic("2015-07-13T07:51:32.358Z", 192, 500)));
+        assertThat(result.get(2), comparesEqualTo(new HealthcheckStatistic("2015-07-13T07:51:33.426Z", 185, 200)));
+    }
+
+    private QueryResult buildQueryResult(List<Object>... values) {
+        QueryResult queryResult = new QueryResult();
+        QueryResult.Result res = new QueryResult.Result();
+        LinkedList<QueryResult.Result> resultList = new LinkedList<>();
+        QueryResult.Series series = new QueryResult.Series();
+        List<QueryResult.Series> seriesList = new LinkedList<>();
+
+        List<List<Object>> valueList = new LinkedList<>();
+
+        for(List<Object> value : values) {
+            valueList.add(value);
+        }
+
+        series.setValues(valueList);
+        seriesList.add(series);
+        res.setSeries(seriesList);
+        resultList.add(res);
+        queryResult.setResults(resultList);
+
+        return queryResult;
     }
 }

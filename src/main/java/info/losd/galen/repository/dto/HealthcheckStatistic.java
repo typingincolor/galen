@@ -1,11 +1,6 @@
-package info.losd.galen.repository;
+package info.losd.galen.repository.dto;
 
-
-import info.losd.galen.repository.dto.Healthcheck;
-import info.losd.galen.repository.dto.HealthcheckDetails;
-import info.losd.galen.repository.dto.HealthcheckStatistic;
-
-import java.util.List;
+import java.time.Instant;
 
 /**
  * The MIT License (MIT)
@@ -30,9 +25,29 @@ import java.util.List;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public interface HealthcheckRepo {
-    void save(HealthcheckDetails s);
+public class HealthcheckStatistic implements Comparable {
+    private Instant timestamp;
+    private int responseTime;
+    private int statusCode;
 
-    List<Healthcheck> getApis();
-    List<HealthcheckStatistic> getStatisticsForPeriod(String healthcheck, Period period);
+    public HealthcheckStatistic(String time, int responseTime, int statusCode) {
+        this.timestamp = Instant.parse(time);
+        this.responseTime = responseTime;
+        this.statusCode = statusCode;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        HealthcheckStatistic that = (HealthcheckStatistic) o;
+
+        if (this.timestamp.equals(that.timestamp) && this.responseTime == that.responseTime && this.statusCode == that.statusCode )
+        {
+            return 0;
+        }
+        else if (this.timestamp.isBefore(that.timestamp)) {
+            return -1;
+        }
+
+        return 1;
+    }
 }

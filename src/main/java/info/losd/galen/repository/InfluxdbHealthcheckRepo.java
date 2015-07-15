@@ -2,6 +2,7 @@ package info.losd.galen.repository;
 
 import info.losd.galen.repository.dto.Healthcheck;
 import info.losd.galen.repository.dto.HealthcheckDetails;
+import info.losd.galen.repository.dto.HealthcheckStatistic;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
@@ -45,7 +46,7 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
     public void save(HealthcheckDetails s) {
         Point point = Point.measurement("statistic")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .tag("api", s.getHealthcheck().getName())
+                .tag("healthcheck", s.getHealthcheck().getName())
                 .field("response_time", s.getDuration())
                 .field("status_code", s.getStatusCode())
                 .build();
@@ -63,5 +64,23 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
         apiList.getResults().get(0).getSeries().get(0).getValues().forEach(value -> healthchecks.add(new Healthcheck((String) value.get(0))));
 
         return healthchecks;
+    }
+
+    @Override
+    public List<HealthcheckStatistic> getStatisticsForPeriod(String healthcheck, Period period) {
+        String queryString = String.format(
+                "SELECT time, response_time, status_code FROM statistic WHERE time > now() - %s AND healthcheck = '%s'"
+                ,period.toString()
+                , healthcheck);
+
+        Query query = new Query(queryString, "galen");
+        QueryResult healthcheckLost = influxDB.query(query);
+
+        List<HealthcheckStatistic> statistics = new LinkedList<>();
+
+        healthcheckLost.getResults().get(0).getSeries().get(0).getValues().forEach(value -> {
+            statistics.add(new HealthcheckStatistic((String) value.get(0), (int) value.get(1), (int) value.get(2)));
+        });
+        return statistics;
     }
 }
