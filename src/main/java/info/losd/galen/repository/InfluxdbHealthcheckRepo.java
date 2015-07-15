@@ -2,6 +2,7 @@ package info.losd.galen.repository;
 
 import info.losd.galen.repository.dto.Healthcheck;
 import info.losd.galen.repository.dto.HealthcheckDetails;
+import info.losd.galen.repository.dto.HealthcheckMean;
 import info.losd.galen.repository.dto.HealthcheckStatistic;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
@@ -82,5 +83,19 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
             statistics.add(new HealthcheckStatistic((String) value.get(0), (int) value.get(1), (int) value.get(2)));
         });
         return statistics;
+    }
+
+    @Override
+    public HealthcheckMean getMeanForPeriod(String healthcheck, Period period) {
+        String queryString = String.format(
+                "SELECT mean(response_time) FROM statistic WHERE time > now() - %s AND healthcheck = '%s'"
+                , period.toString()
+                , healthcheck);
+
+        Query query = new Query(queryString, "galen");
+        QueryResult healthcheckLost = influxDB.query(query);
+
+        List<Object> value =  healthcheckLost.getResults().get(0).getSeries().get(0).getValues().get(0);
+        return new HealthcheckMean((String) value.get(0), (double) value.get(1));
     }
 }

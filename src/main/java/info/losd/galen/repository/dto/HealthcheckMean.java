@@ -1,12 +1,6 @@
-package info.losd.galen.repository;
+package info.losd.galen.repository.dto;
 
-
-import info.losd.galen.repository.dto.Healthcheck;
-import info.losd.galen.repository.dto.HealthcheckDetails;
-import info.losd.galen.repository.dto.HealthcheckMean;
-import info.losd.galen.repository.dto.HealthcheckStatistic;
-
-import java.util.List;
+import java.time.Instant;
 
 /**
  * The MIT License (MIT)
@@ -31,12 +25,19 @@ import java.util.List;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public interface HealthcheckRepo {
-    void save(HealthcheckDetails s);
+public class HealthcheckMean {
+    private Instant timestamp;
+    private double mean;
+    public HealthcheckMean(String timestamp, double mean) {
+        this.timestamp = Instant.parse(timestamp);
+        this.mean = mean;
+    }
 
-    List<Healthcheck> getApis();
+    public Instant getTimestamp() {
+        return timestamp;
+    }
 
-    List<HealthcheckStatistic> getStatisticsForPeriod(String healthcheck, Period period);
-
-    HealthcheckMean getMeanForPeriod(String healthcheck, Period period);
+    public double getMean() {
+        return mean;
+    }
 }

@@ -4,6 +4,7 @@ import info.losd.galen.repository.InfluxdbHealthcheckRepo;
 import info.losd.galen.repository.Period;
 import info.losd.galen.repository.dto.Healthcheck;
 import info.losd.galen.repository.dto.HealthcheckDetails;
+import info.losd.galen.repository.dto.HealthcheckMean;
 import info.losd.galen.repository.dto.HealthcheckStatistic;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.influxdb.InfluxDB;
@@ -17,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -127,6 +129,24 @@ public class TestInfluxdbHealthcheckRepo {
         assertThat(result.get(0), comparesEqualTo(new HealthcheckStatistic("2015-07-13T07:51:25.165Z", 937, 200)));
         assertThat(result.get(1), comparesEqualTo(new HealthcheckStatistic("2015-07-13T07:51:32.358Z", 192, 500)));
         assertThat(result.get(2), comparesEqualTo(new HealthcheckStatistic("2015-07-13T07:51:33.426Z", 185, 200)));
+    }
+
+    @Test
+    public void test_it_can_get_the_mean_response_time_for_a_period() throws Exception {
+        List<Object> mean = new LinkedList<>(Arrays.asList("2015-07-12T00:00:00.05138052Z", 227.22135161606295));
+
+        QueryResult queryResult = buildQueryResult(mean);
+
+        ArgumentCaptor<Query> query = ArgumentCaptor.forClass(Query.class);
+        when(db.query(query.capture())).thenReturn(queryResult);
+
+        HealthcheckMean result = repo.getMeanForPeriod("healthcheck1", Period.TWO_MINUTES);
+
+        assertThat(query.getValue().getCommand(), is(equalTo("SELECT mean(response_time) FROM statistic WHERE time > now() - 2m AND healthcheck = 'healthcheck1'")));
+        assertThat(query.getValue().getDatabase(), is(equalTo("galen")));
+
+        assertThat(result.getTimestamp(), is(equalTo(Instant.parse("2015-07-12T00:00:00.05138052Z"))));
+        assertThat(result.getMean(), is(equalTo(227.22135161606295)));
     }
 
     private QueryResult buildQueryResult(List<Object>... values) {
