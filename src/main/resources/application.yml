@@ -1,3 +1,4 @@
 galen:
     influxdb:
         url: http://localhost:8086
+        dbname: galen

@@ -11,6 +11,7 @@ import org.influxdb.dto.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
@@ -46,6 +47,9 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
     @Autowired
     InfluxDB influxDB;
 
+    @Value("${galen.influxdb.dbname}")
+    private String dbname;
+
     private Logger logger = LoggerFactory.getLogger(InfluxdbHealthcheckRepo.class);
 
     @Override
@@ -57,12 +61,12 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
                 .field("status_code", s.getStatusCode())
                 .build();
 
-        influxDB.write("galen", "default", point);
+        influxDB.write(dbname, "default", point);
     }
 
     @Override
     public List<Healthcheck> getHealthchecks() {
-        Query query = new Query("SHOW TAG VALUES FROM statistic WITH KEY = healthcheck", "galen");
+        Query query = new Query("SHOW TAG VALUES FROM statistic WITH KEY = healthcheck", dbname);
         QueryResult apiList = influxDB.query(query);
 
         List<Healthcheck> healthchecks = new LinkedList<>();
@@ -84,7 +88,7 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
                 , period.toString()
                 , healthcheck);
 
-        Query query = new Query(queryString, "galen");
+        Query query = new Query(queryString, dbname);
         QueryResult healthcheckLost = influxDB.query(query);
 
         List<HealthcheckStatistic> statistics = new LinkedList<>();
@@ -107,7 +111,7 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
                 , period.toString()
                 , healthcheck);
 
-        Query query = new Query(queryString, "galen");
+        Query query = new Query(queryString, dbname);
         QueryResult healthcheckLost = influxDB.query(query);
 
         try {
