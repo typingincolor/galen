@@ -48,7 +48,7 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
     InfluxDB influxDB;
 
     @Value("${galen.influxdb.dbname}")
-    private String dbname;
+    private String dbname = "galen";
 
     private Logger logger = LoggerFactory.getLogger(InfluxdbHealthcheckRepo.class);
 
