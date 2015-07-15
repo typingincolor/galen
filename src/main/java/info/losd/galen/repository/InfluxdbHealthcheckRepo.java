@@ -90,9 +90,9 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
         List<HealthcheckStatistic> statistics = new LinkedList<>();
 
         try {
-            healthcheckLost.getResults().get(0).getSeries().get(0).getValues().forEach(value -> {
-                statistics.add(new HealthcheckStatistic((String) value.get(0), (int) value.get(1), (int) value.get(2)));
-            });
+            healthcheckLost.getResults().get(0).getSeries().get(0).getValues().forEach(value ->
+                statistics.add(new HealthcheckStatistic((String) value.get(0), (int) value.get(1), (int) value.get(2)))
+            );
         } catch (Exception e) {
             logger.info("Returning empty list of statistics: {}", e.getMessage());
             return Collections.<HealthcheckStatistic>emptyList();
