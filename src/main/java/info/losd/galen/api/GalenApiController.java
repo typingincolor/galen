@@ -91,9 +91,9 @@ public class GalenApiController {
     @RequestMapping(value = "/healthchecks/{name}/statistics/mean", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public HttpEntity<String> getMean(@PathVariable String name,
-                                            @RequestParam(value = "period",
-                                                    required = false,
-                                                    defaultValue = "2m") String period) {
+                                      @RequestParam(value = "period",
+                                              required = false,
+                                              defaultValue = "2m") String period) {
         return new ResponseEntity<>("boom", HttpStatus.OK);
     }
 

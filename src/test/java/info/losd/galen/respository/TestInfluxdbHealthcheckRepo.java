@@ -138,7 +138,7 @@ public class TestInfluxdbHealthcheckRepo {
 
         List<List<Object>> valueList = new LinkedList<>();
 
-        for(List<Object> value : values) {
+        for (List<Object> value : values) {
             valueList.add(value);
         }
 

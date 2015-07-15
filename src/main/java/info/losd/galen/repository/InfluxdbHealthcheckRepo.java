@@ -70,7 +70,7 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
     public List<HealthcheckStatistic> getStatisticsForPeriod(String healthcheck, Period period) {
         String queryString = String.format(
                 "SELECT time, response_time, status_code FROM statistic WHERE time > now() - %s AND healthcheck = '%s'"
-                ,period.toString()
+                , period.toString()
                 , healthcheck);
 
         Query query = new Query(queryString, "galen");

@@ -40,11 +40,9 @@ public class HealthcheckStatistic implements Comparable {
     public int compareTo(Object o) {
         HealthcheckStatistic that = (HealthcheckStatistic) o;
 
-        if (this.timestamp.equals(that.timestamp) && this.responseTime == that.responseTime && this.statusCode == that.statusCode )
-        {
+        if (this.timestamp.equals(that.timestamp) && this.responseTime == that.responseTime && this.statusCode == that.statusCode) {
             return 0;
-        }
-        else if (this.timestamp.isBefore(that.timestamp)) {
+        } else if (this.timestamp.isBefore(that.timestamp)) {
             return -1;
         }
 

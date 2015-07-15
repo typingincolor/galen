@@ -34,5 +34,6 @@ public interface HealthcheckRepo {
     void save(HealthcheckDetails s);
 
     List<Healthcheck> getApis();
+
     List<HealthcheckStatistic> getStatisticsForPeriod(String healthcheck, Period period);
 }
