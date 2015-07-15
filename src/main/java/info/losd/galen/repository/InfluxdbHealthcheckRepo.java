@@ -70,7 +70,7 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
         try {
             apiList.getResults().get(0).getSeries().get(0).getValues().forEach(value -> healthchecks.add(new Healthcheck((String) value.get(0))));
         } catch (Exception e) {
-            logger.info("Returning empty list of health checks {}", e.getMessage());
+            logger.info("Returning empty list of health checks: {}", e.getMessage());
             return Collections.<Healthcheck>emptyList();
         }
 
@@ -94,7 +94,7 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
                 statistics.add(new HealthcheckStatistic((String) value.get(0), (int) value.get(1), (int) value.get(2)));
             });
         } catch (Exception e) {
-            logger.info("Returning empty list of statistics {}", e.getMessage());
+            logger.info("Returning empty list of statistics: {}", e.getMessage());
             return Collections.<HealthcheckStatistic>emptyList();
         }
         return statistics;
@@ -115,6 +115,7 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
             return new HealthcheckMean((String) value.get(0), (double) value.get(1));
         }
         catch (Exception e) {
+            logger.info("Unable to calculate mean: {}", e.getMessage());
             throw new MeanNotCalculatedException(e);
         }
     }
