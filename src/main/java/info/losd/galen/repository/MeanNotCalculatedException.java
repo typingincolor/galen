@@ -1,13 +1,5 @@
 package info.losd.galen.repository;
 
-
-import info.losd.galen.repository.dto.Healthcheck;
-import info.losd.galen.repository.dto.HealthcheckDetails;
-import info.losd.galen.repository.dto.HealthcheckMean;
-import info.losd.galen.repository.dto.HealthcheckStatistic;
-
-import java.util.List;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -31,12 +23,8 @@ import java.util.List;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public interface HealthcheckRepo {
-    void save(HealthcheckDetails s);
-
-    List<Healthcheck> getHealthchecks();
-
-    List<HealthcheckStatistic> getStatisticsForPeriod(String healthcheck, Period period);
-
-    HealthcheckMean getMeanForPeriod(String healthcheck, Period period) throws MeanNotCalculatedException;
+public class MeanNotCalculatedException extends Exception {
+    public MeanNotCalculatedException(Exception e) {
+        super(e);
+    }
 }

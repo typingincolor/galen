@@ -69,8 +69,7 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
 
         try {
             apiList.getResults().get(0).getSeries().get(0).getValues().forEach(value -> healthchecks.add(new Healthcheck((String) value.get(0))));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.info("Returning empty list of health checks {}", e.getMessage());
             return Collections.<Healthcheck>emptyList();
         }
@@ -90,14 +89,19 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
 
         List<HealthcheckStatistic> statistics = new LinkedList<>();
 
-        healthcheckLost.getResults().get(0).getSeries().get(0).getValues().forEach(value -> {
-            statistics.add(new HealthcheckStatistic((String) value.get(0), (int) value.get(1), (int) value.get(2)));
-        });
+        try {
+            healthcheckLost.getResults().get(0).getSeries().get(0).getValues().forEach(value -> {
+                statistics.add(new HealthcheckStatistic((String) value.get(0), (int) value.get(1), (int) value.get(2)));
+            });
+        } catch (Exception e) {
+            logger.info("Returning empty list of statistics {}", e.getMessage());
+            return Collections.<HealthcheckStatistic>emptyList();
+        }
         return statistics;
     }
 
     @Override
-    public HealthcheckMean getMeanForPeriod(String healthcheck, Period period) {
+    public HealthcheckMean getMeanForPeriod(String healthcheck, Period period) throws MeanNotCalculatedException {
         String queryString = String.format(
                 "SELECT mean(response_time) FROM statistic WHERE time > now() - %s AND healthcheck = '%s'"
                 , period.toString()
@@ -106,7 +110,12 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
         Query query = new Query(queryString, "galen");
         QueryResult healthcheckLost = influxDB.query(query);
 
-        List<Object> value =  healthcheckLost.getResults().get(0).getSeries().get(0).getValues().get(0);
-        return new HealthcheckMean((String) value.get(0), (double) value.get(1));
+        try {
+            List<Object> value = healthcheckLost.getResults().get(0).getSeries().get(0).getValues().get(0);
+            return new HealthcheckMean((String) value.get(0), (double) value.get(1));
+        }
+        catch (Exception e) {
+            throw new MeanNotCalculatedException(e);
+        }
     }
 }
