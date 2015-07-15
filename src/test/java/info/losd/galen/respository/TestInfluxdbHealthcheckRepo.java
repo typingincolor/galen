@@ -127,9 +127,9 @@ public class TestInfluxdbHealthcheckRepo {
 
     @Test
     public void test_it_can_get_statistics_for_a_period() throws Exception {
-        List<Object> statistic1 = new LinkedList<>(Arrays.asList("2015-07-13T07:51:25.165Z", 937, 200));
-        List<Object> statistic2 = new LinkedList<>(Arrays.asList("2015-07-13T07:51:32.358Z", 192, 500));
-        List<Object> statistic3 = new LinkedList<>(Arrays.asList("2015-07-13T07:51:33.426Z", 185, 200));
+        List<Object> statistic1 = new LinkedList<>(Arrays.asList("2015-07-13T07:51:25.165Z", 937.0, 200.0));
+        List<Object> statistic2 = new LinkedList<>(Arrays.asList("2015-07-13T07:51:32.358Z", 192.0, 500.0));
+        List<Object> statistic3 = new LinkedList<>(Arrays.asList("2015-07-13T07:51:33.426Z", 185.0, 200.0));
 
         QueryResult queryResult = buildQueryResult(statistic1, statistic2, statistic3);
 
@@ -138,7 +138,7 @@ public class TestInfluxdbHealthcheckRepo {
 
         List<HealthcheckStatistic> result = repo.getStatisticsForPeriod("healthcheck1", Period.TWO_MINUTES);
 
-        assertThat(query.getValue().getCommand(), is(equalTo("SELECT time, response_time, status_code FROM statistic WHERE time > now() - 2m AND healthcheck = 'healthcheck1'")));
+        assertThat(query.getValue().getCommand(), is(equalTo("SELECT response_time, status_code FROM statistic WHERE time > now() - 2m AND healthcheck = 'healthcheck1'")));
         assertThat(query.getValue().getDatabase(), is(equalTo("galen-web")));
         assertThat(result, IsCollectionWithSize.hasSize(3));
 

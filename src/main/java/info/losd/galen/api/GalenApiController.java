@@ -3,11 +3,13 @@ package info.losd.galen.api;
 import info.losd.galen.api.dto.Healthcheck;
 import info.losd.galen.api.dto.HealthcheckRequest;
 import info.losd.galen.api.dto.HealthcheckResult;
+import info.losd.galen.api.dto.HealthcheckStatistic;
 import info.losd.galen.client.ApiClient;
 import info.losd.galen.client.ApiMethod;
 import info.losd.galen.client.dto.ApiRequest;
 import info.losd.galen.client.dto.ApiResponse;
 import info.losd.galen.repository.HealthcheckRepo;
+import info.losd.galen.repository.Period;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -73,33 +75,49 @@ public class GalenApiController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/healthchecks/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/healthchecks/{name}", method = RequestMethod.GET,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public HttpEntity<Healthcheck> getHealtcheck(@PathVariable String name) {
         return new ResponseEntity<>(new Healthcheck(name), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/healthchecks/{name}/statistics", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/healthchecks/{name}/statistics", method = RequestMethod.GET,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public HttpEntity<String> getStatistics(@PathVariable String name,
-                                            @RequestParam(value = "period",
-                                                    required = false,
-                                                    defaultValue = "2m") String period) {
-        return new ResponseEntity<>("boom", HttpStatus.OK);
+    public HttpEntity<List<HealthcheckStatistic>> getStatistics(@PathVariable String name,
+                                                                @RequestParam(value = "period",
+                                                                              required = false,
+                                                                              defaultValue = "2m") String period)
+    {
+        List<HealthcheckStatistic> result = new LinkedList<>();
+        Period p = Period.getPeriod(period);
+        List<info.losd.galen.repository.dto.HealthcheckStatistic> stats =
+                repo.getStatisticsForPeriod(name, p);
+
+        stats.forEach(stat -> {
+            result.add(new HealthcheckStatistic(stat.getTimestamp(), stat.getResponseTime(), stat.getStatusCode()));
+        });
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/healthchecks/{name}/statistics/mean", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/healthchecks/{name}/statistics/mean", method = RequestMethod.GET,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public HttpEntity<String> getMean(@PathVariable String name,
                                       @RequestParam(value = "period",
-                                              required = false,
-                                              defaultValue = "2m") String period) {
+                                                    required = false,
+                                                    defaultValue = "2m") String period)
+    {
         return new ResponseEntity<>("boom", HttpStatus.OK);
     }
 
 
     @ExceptionHandler(IllegalArgumentException.class)
-    void illegalArgumentException(HttpServletResponse response) throws IOException {
+    void illegalArgumentException(HttpServletResponse response) throws
+            IOException
+    {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.sendError(HttpStatus.BAD_REQUEST.value(), "The method specified is invalid");
     }

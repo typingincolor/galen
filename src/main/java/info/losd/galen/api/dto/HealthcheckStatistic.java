@@ -1,4 +1,8 @@
-package info.losd.galen.repository.dto;
+package info.losd.galen.api.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.time.Instant;
 
@@ -26,43 +30,16 @@ import java.time.Instant;
  * THE SOFTWARE.
  */
 public class HealthcheckStatistic {
-    private Instant timestamp;
-    private long responseTime;
-    private long statusCode;
+    @JsonSerialize(using = InstantToStringSerializer.class) private final Instant timestamp;
+    @JsonProperty("response_time") private final long responseTime;
+    @JsonProperty("status_code") private final long statusCode;
 
-    public HealthcheckStatistic(String time, long responseTime, long statusCode) {
-        this.timestamp = Instant.parse(time);
+    public HealthcheckStatistic(Instant timestamp,
+                                long responseTime,
+                                long statusCode)
+    {
+        this.timestamp = timestamp;
         this.responseTime = responseTime;
         this.statusCode = statusCode;
-    }
-
-    public Instant getTimestamp() {
-        return timestamp;
-    }
-
-    public long getResponseTime() {
-        return responseTime;
-    }
-
-    public long getStatusCode() {
-        return statusCode;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = timestamp != null ? timestamp.hashCode() : 0;
-        result = 31 * result + (int) (responseTime ^ (responseTime >>> 32));
-        result = 31 * result + (int) (statusCode ^ (statusCode >>> 32));
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null || obj.getClass() != this.getClass()) {
-            return false;
-        }
-
-        HealthcheckStatistic that = (HealthcheckStatistic) obj;
-        return this.timestamp.equals(that.timestamp) && this.responseTime == that.responseTime && this.statusCode == that.statusCode;
     }
 }

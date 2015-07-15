@@ -84,18 +84,22 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
     @Override
     public List<HealthcheckStatistic> getStatisticsForPeriod(String healthcheck, Period period) {
         String queryString = String.format(
-                "SELECT time, response_time, status_code FROM statistic WHERE time > now() - %s AND healthcheck = '%s'"
+                "SELECT response_time, status_code FROM statistic WHERE time > now() - %s AND healthcheck = '%s'"
                 , period.toString()
                 , healthcheck);
 
         Query query = new Query(queryString, db.getName());
-        QueryResult healthcheckLost = influxDB.query(query);
+        QueryResult healthcheckList = influxDB.query(query);
 
         List<HealthcheckStatistic> statistics = new LinkedList<>();
 
         try {
-            healthcheckLost.getResults().get(0).getSeries().get(0).getValues().forEach(value ->
-                statistics.add(new HealthcheckStatistic((String) value.get(0), (int) value.get(1), (int) value.get(2)))
+            healthcheckList.getResults().get(0).getSeries().get(0).getValues().forEach(value ->
+                statistics.add(new HealthcheckStatistic(
+                        (String) value.get(0),
+                        Math.round((double) value.get(1)),
+                        Math.round((double) value.get(2))
+                ))
             );
         } catch (Exception e) {
             logger.info("Returning empty list of statistics: {}", e.getMessage());
@@ -112,10 +116,10 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
                 , healthcheck);
 
         Query query = new Query(queryString, db.getName());
-        QueryResult healthcheckLost = influxDB.query(query);
+        QueryResult healthcheckList = influxDB.query(query);
 
         try {
-            List<Object> value = healthcheckLost.getResults().get(0).getSeries().get(0).getValues().get(0);
+            List<Object> value = healthcheckList.getResults().get(0).getSeries().get(0).getValues().get(0);
             return new HealthcheckMean((String) value.get(0), (double) value.get(1));
         }
         catch (Exception e) {

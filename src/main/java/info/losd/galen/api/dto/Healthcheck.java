@@ -3,6 +3,7 @@ package info.losd.galen.api.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import info.losd.galen.api.GalenApiController;
+import info.losd.galen.repository.Period;
 import org.springframework.hateoas.ResourceSupport;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;

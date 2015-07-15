@@ -1,4 +1,12 @@
-package info.losd.galen.repository;
+package info.losd.galen.api.dto;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+
+import java.io.IOException;
+import java.time.Instant;
 
 /**
  * The MIT License (MIT)
@@ -23,30 +31,14 @@ package info.losd.galen.repository;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public enum Period {
-    TWO_MINUTES("2m"), TEN_MINUTES("10m"), ONE_HOUR("1h");
-
-    private final String text;
-
-    private Period(final String text) {
-        this.text = text;
-    }
-
+public class InstantToStringSerializer extends JsonSerializer<Instant> {
     @Override
-    public String toString() {
-        return text;
-    }
-
-    public static Period getPeriod(String period) {
-        switch(period) {
-            case "2m":
-                return Period.TWO_MINUTES;
-            case "10m":
-                return Period.TEN_MINUTES;
-            case "1h":
-                return Period.ONE_HOUR;
-            default:
-                return Period.TWO_MINUTES;
-        }
+    public void serialize(Instant value,
+                          JsonGenerator jgen,
+                          SerializerProvider provider) throws
+            IOException,
+            JsonProcessingException
+    {
+        jgen.writeObject(value.toString());
     }
 }
