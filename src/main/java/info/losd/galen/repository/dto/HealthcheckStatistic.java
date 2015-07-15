@@ -25,7 +25,7 @@ import java.time.Instant;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class HealthcheckStatistic implements Comparable {
+public class HealthcheckStatistic {
     private Instant timestamp;
     private int responseTime;
     private int statusCode;
@@ -37,15 +37,20 @@ public class HealthcheckStatistic implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-        HealthcheckStatistic that = (HealthcheckStatistic) o;
+    public int hashCode() {
+        int result = timestamp != null ? timestamp.hashCode() : 0;
+        result = 31 * result + responseTime;
+        result = 31 * result + statusCode;
+        return result;
+    }
 
-        if (this.timestamp.equals(that.timestamp) && this.responseTime == that.responseTime && this.statusCode == that.statusCode) {
-            return 0;
-        } else if (this.timestamp.isBefore(that.timestamp)) {
-            return -1;
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
         }
 
-        return 1;
+        HealthcheckStatistic that = (HealthcheckStatistic) obj;
+        return this.timestamp.equals(that.timestamp) && this.responseTime == that.responseTime && this.statusCode == that.statusCode;
     }
 }

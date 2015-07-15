@@ -20,12 +20,12 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.comparesEqualTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
@@ -90,9 +90,9 @@ public class TestInfluxdbHealthcheckRepo {
 
     @Test
     public void test_it_can_get_a_list_of_apis() {
-        List<Object> api1 = new LinkedList<>(Arrays.asList("api1"));
-        List<Object> api2 = new LinkedList<>(Arrays.asList("api2"));
-        List<Object> api3 = new LinkedList<>(Arrays.asList("api3"));
+        List<Object> api1 = new LinkedList<>(Collections.singletonList("api1"));
+        List<Object> api2 = new LinkedList<>(Collections.singletonList("api2"));
+        List<Object> api3 = new LinkedList<>(Collections.singletonList("api3"));
 
         QueryResult queryResult = buildQueryResult(api1, api2, api3);
 
@@ -126,9 +126,9 @@ public class TestInfluxdbHealthcheckRepo {
         assertThat(query.getValue().getDatabase(), is(equalTo("galen")));
         assertThat(result, IsCollectionWithSize.hasSize(3));
 
-        assertThat(result.get(0), comparesEqualTo(new HealthcheckStatistic("2015-07-13T07:51:25.165Z", 937, 200)));
-        assertThat(result.get(1), comparesEqualTo(new HealthcheckStatistic("2015-07-13T07:51:32.358Z", 192, 500)));
-        assertThat(result.get(2), comparesEqualTo(new HealthcheckStatistic("2015-07-13T07:51:33.426Z", 185, 200)));
+        assertThat(result.get(0), is(equalTo(new HealthcheckStatistic("2015-07-13T07:51:25.165Z", 937, 200))));
+        assertThat(result.get(1), is(equalTo(new HealthcheckStatistic("2015-07-13T07:51:32.358Z", 192, 500))));
+        assertThat(result.get(2), is(equalTo(new HealthcheckStatistic("2015-07-13T07:51:33.426Z", 185, 200))));
     }
 
     @Test
@@ -149,7 +149,8 @@ public class TestInfluxdbHealthcheckRepo {
         assertThat(result.getMean(), is(equalTo(227.22135161606295)));
     }
 
-    private QueryResult buildQueryResult(List<Object>... values) {
+    @SafeVarargs
+    private final QueryResult buildQueryResult(List<Object>... values) {
         QueryResult queryResult = new QueryResult();
         QueryResult.Result res = new QueryResult.Result();
         LinkedList<QueryResult.Result> resultList = new LinkedList<>();
@@ -158,9 +159,7 @@ public class TestInfluxdbHealthcheckRepo {
 
         List<List<Object>> valueList = new LinkedList<>();
 
-        for (List<Object> value : values) {
-            valueList.add(value);
-        }
+        Collections.addAll(valueList, values);
 
         series.setValues(valueList);
         seriesList.add(series);

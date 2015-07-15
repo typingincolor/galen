@@ -2,6 +2,7 @@ package info.losd.galen.client;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import info.losd.galen.client.dto.ApiRequest;
 import info.losd.galen.client.dto.ApiResponse;
 import info.losd.galen.repository.HealthcheckRepo;
@@ -47,6 +48,7 @@ import static org.mockito.Mockito.verify;
  */
 public class TestApiClient {
     @Rule
+    @SuppressFBWarnings(value = {"URF_UNREAD_FIELD", "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"}, justification = "Wiremock uses it")
     public WireMockRule wireMockRule = new WireMockRule();
 
     @Mock
