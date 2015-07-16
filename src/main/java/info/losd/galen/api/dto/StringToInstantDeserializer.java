@@ -1,9 +1,11 @@
 package info.losd.galen.api.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 
+import java.io.IOException;
 import java.time.Instant;
 
 /**
@@ -29,38 +31,9 @@ import java.time.Instant;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@SuppressWarnings("all")
-public class HealthcheckStatistic {
-    @JsonSerialize(using = InstantToStringSerializer.class)
-    @JsonDeserialize(using = StringToInstantDeserializer.class)
-    private Instant timestamp = null;
-
-    @JsonProperty("response_time") private long responseTime = 0;
-
-    @JsonProperty("status_code") private long statusCode = 0;
-
-    public HealthcheckStatistic(Instant timestamp,
-                                long responseTime,
-                                long statusCode)
-    {
-        this.timestamp = timestamp;
-        this.responseTime = responseTime;
-        this.statusCode = statusCode;
-    }
-
-    public HealthcheckStatistic() {
-
-    }
-
-    public Instant getTimestamp() {
-        return timestamp;
-    }
-
-    public long getResponseTime() {
-        return responseTime;
-    }
-
-    public long getStatusCode() {
-        return statusCode;
+public class StringToInstantDeserializer extends JsonDeserializer<Instant> {
+    @Override
+    public Instant deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+        return Instant.parse(jp.getText());
     }
 }

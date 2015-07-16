@@ -1,10 +1,13 @@
-package info.losd.galen.api.dto;
+package info.losd.galen.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import info.losd.galen.api.dto.Healthcheck;
+import org.junit.Test;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 
-import java.time.Instant;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * The MIT License (MIT)
@@ -29,38 +32,16 @@ import java.time.Instant;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@SuppressWarnings("all")
-public class HealthcheckStatistic {
-    @JsonSerialize(using = InstantToStringSerializer.class)
-    @JsonDeserialize(using = StringToInstantDeserializer.class)
-    private Instant timestamp = null;
+public class TestGetHealthcheckDetails extends GalenApiControllerTest {
+    @Test
+    public void it_gets_the_details_of_a_healthcheck() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get("/healthchecks/healthcheck1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
-    @JsonProperty("response_time") private long responseTime = 0;
+        Healthcheck result = gson.fromJson(mvcResult.getResponse().getContentAsString(), Healthcheck.class);
 
-    @JsonProperty("status_code") private long statusCode = 0;
-
-    public HealthcheckStatistic(Instant timestamp,
-                                long responseTime,
-                                long statusCode)
-    {
-        this.timestamp = timestamp;
-        this.responseTime = responseTime;
-        this.statusCode = statusCode;
-    }
-
-    public HealthcheckStatistic() {
-
-    }
-
-    public Instant getTimestamp() {
-        return timestamp;
-    }
-
-    public long getResponseTime() {
-        return responseTime;
-    }
-
-    public long getStatusCode() {
-        return statusCode;
+        checkHealthcheck(result, "healthcheck1");
     }
 }
