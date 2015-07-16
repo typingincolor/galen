@@ -1,6 +1,7 @@
 package info.losd.galen.repository.dto;
 
 import java.time.Instant;
+import java.util.List;
 
 /**
  * The MIT License (MIT)
@@ -30,8 +31,14 @@ public class HealthcheckStatistic {
     private long responseTime;
     private long statusCode;
 
-    public HealthcheckStatistic(String time, long responseTime, long statusCode) {
-        this.timestamp = Instant.parse(time);
+    public HealthcheckStatistic(List<Object> values) {
+        this.timestamp = Instant.parse((String) values.get(0));
+        this.responseTime = Math.round((double) values.get(1));
+        this.statusCode = Math.round((double) values.get(2));
+    }
+
+    public HealthcheckStatistic(String timestamp, long responseTime, long statusCode) {
+        this.timestamp = Instant.parse(timestamp);
         this.responseTime = responseTime;
         this.statusCode = statusCode;
     }

@@ -95,11 +95,7 @@ public class InfluxdbHealthcheckRepo implements HealthcheckRepo {
 
         try {
             healthcheckList.getResults().get(0).getSeries().get(0).getValues().forEach(value ->
-                statistics.add(new HealthcheckStatistic(
-                        (String) value.get(0),
-                        Math.round((double) value.get(1)),
-                        Math.round((double) value.get(2))
-                ))
+                statistics.add(new HealthcheckStatistic(value))
             );
         } catch (Exception e) {
             logger.info("Returning empty list of statistics: {}", e.getMessage());

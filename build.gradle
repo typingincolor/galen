@@ -63,3 +63,19 @@ tasks.withType(FindBugs) {
         html.enabled = true
     }
 }
+
+test {
+    useJUnit {
+        excludeCategories 'info.losd.galen.IntegrationTest'
+    }
+}
+
+task integrationTest(type: Test) {
+
+}
+
+integrationTest {
+    useJUnit {
+        includeCategories 'info.losd.galen.IntegrationTest'
+    }
+}
