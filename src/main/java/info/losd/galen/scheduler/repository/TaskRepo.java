@@ -1,6 +1,6 @@
-package info.losd.galen.repository;
+package info.losd.galen.scheduler.repository;
 
-import info.losd.galen.repository.entity.Task;
+import info.losd.galen.scheduler.repository.entity.Task;
 import org.springframework.data.repository.CrudRepository;
 
 /**

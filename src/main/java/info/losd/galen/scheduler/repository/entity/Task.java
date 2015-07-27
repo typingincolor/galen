@@ -1,4 +1,4 @@
-package info.losd.galen.repository.entity;
+package info.losd.galen.scheduler.repository.entity;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

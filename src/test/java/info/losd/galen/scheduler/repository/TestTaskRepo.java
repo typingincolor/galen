@@ -1,9 +1,8 @@
-package info.losd.galen.respository;
+package info.losd.galen.scheduler.repository;
 
 import info.losd.galen.Galen;
 import info.losd.galen.IntegrationTest;
-import info.losd.galen.repository.TaskRepo;
-import info.losd.galen.repository.entity.Task;
+import info.losd.galen.scheduler.repository.entity.Task;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
