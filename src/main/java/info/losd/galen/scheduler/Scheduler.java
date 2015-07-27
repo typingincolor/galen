@@ -1,10 +1,13 @@
-package info.losd.galen;
+package info.losd.galen.scheduler;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import info.losd.galen.scheduler.repository.TaskRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.text.SimpleDateFormat;
 
 /**
  * The MIT License (MIT)
@@ -29,12 +32,17 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@SpringBootApplication
-@ComponentScan
-@EnableAutoConfiguration
-@EnableScheduling
-public class Galen {
-    public static void main(String[] args) {
-        SpringApplication.run(Galen.class, args);
+@Component
+public class Scheduler {
+    @Autowired
+    TaskRepo repo;
+
+    Logger LOG = LoggerFactory.getLogger(Scheduler.class);
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+
+    @Scheduled(fixedRate = 5000)
+    public void reportCurrentTime() {
+       LOG.info("There are {} tasks waiting", repo.findTasksToBeRun().size());
     }
 }

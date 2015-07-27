@@ -1,7 +1,8 @@
 package info.losd.galen.scheduler.repository;
 
 import info.losd.galen.Galen;
-import info.losd.galen.scheduler.repository.entity.Task;
+import info.losd.galen.scheduler.entity.Header;
+import info.losd.galen.scheduler.entity.Task;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,11 +10,14 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -57,14 +61,22 @@ public class TestTaskRepo {
 
     @Test
     public void test_it_can_get_a_list_of_tasks_to_be_run() {
-        repo.save(new Task("test_task", 10, Instant.now().minusSeconds(10)));
-        repo.save(new Task("test_task", 10, Instant.now().minusSeconds(10)));
-        repo.save(new Task("test_task", 10, Instant.now().minusSeconds(10)));
-        repo.save(new Task("test_task", 10, Instant.now().plusSeconds(11)));
-        repo.save(new Task("test_task", 10, Instant.now().plusSeconds(12)));
+        List<Header> headers = Arrays.asList(new Header("h1", "v1"), new Header("h2", "v2"));
+        String url = "http://localhost:8080/test";
+        String method = HttpMethod.GET.toString();
+
+        repo.save(new Task("test_task", 10, Instant.now().minusSeconds(10), url, method, Collections.emptyList()));
+        repo.save(new Task("test_task", 10, Instant.now().minusSeconds(10), url, method, Collections.emptyList()));
+        repo.save(new Task("test_task", 10, Instant.now().minusSeconds(10), url, method, headers));
+        repo.save(new Task("test_task", 10, Instant.now().plusSeconds(11), url, method, Collections.emptyList()));
+        repo.save(new Task("test_task", 10, Instant.now().plusSeconds(12), url, method, Collections.emptyList()));
 
         List<Task> result = repo.findTasksToBeRun();
 
         assertThat(result, IsCollectionWithSize.hasSize(3));
+
+        result.forEach(res -> {
+            LOG.info("{} has {} headers", res.toString(), res.getHeaders().size());
+        });
     }
 }

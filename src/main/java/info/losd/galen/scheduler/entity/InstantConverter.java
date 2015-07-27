@@ -1,4 +1,4 @@
-package info.losd.galen.scheduler.repository.entity;
+package info.losd.galen.scheduler.entity;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

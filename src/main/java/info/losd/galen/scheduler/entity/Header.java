@@ -1,12 +1,6 @@
-package info.losd.galen.scheduler.repository.entity;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import info.losd.galen.json.InstantToStringSerializer;
-import info.losd.galen.json.StringToInstantDeserializer;
+package info.losd.galen.scheduler.entity;
 
 import javax.persistence.*;
-import java.time.Instant;
 
 /**
  * The MIT License (MIT)
@@ -32,25 +26,21 @@ import java.time.Instant;
  * THE SOFTWARE.
  */
 @Entity
-public class Task {
+public class Header {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
-    @JsonSerialize(using = InstantToStringSerializer.class)
-    @JsonDeserialize(using = StringToInstantDeserializer.class)
-    private Instant lastUpdated;
-    private int period;
-    private String name;
+    private String header;
+    private String value;
 
-    public Task() {
+    public Header() {
 
     }
 
-    public Task(String name, int period, Instant lastUpdated) {
-        this.name = name;
-        this.period = period;
-        this.lastUpdated = lastUpdated;
+    public Header(String header, String value) {
+        this.header = header;
+        this.value = value;
     }
 
     public long getId() {
@@ -61,33 +51,19 @@ public class Task {
         this.id = id;
     }
 
-    public Instant getLastUpdated() {
-        return lastUpdated;
+    public String getHeader() {
+        return header;
     }
 
-    public void setLastUpdated(Instant lastUpdated) {
-        this.lastUpdated = lastUpdated;
+    public void setHeader(String header) {
+        this.header = header;
     }
 
-    public int getPeriod() {
-        return period;
+    public String getValue() {
+        return value;
     }
 
-    public void setPeriod(int period) {
-        this.period = period;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Task[id = %d, name = '%s', period = %d, lastUpdated = '%s']",
-                id, name, period, lastUpdated.toString());
+    public void setValue(String value) {
+        this.value = value;
     }
 }
