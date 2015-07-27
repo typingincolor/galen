@@ -1,13 +1,16 @@
 package info.losd.galen.scheduler;
 
+import info.losd.galen.scheduler.entity.Task;
 import info.losd.galen.scheduler.repository.TaskRepo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.text.SimpleDateFormat;
+import java.util.Collections;
+
+import static org.mockito.Mockito.*;
 
 /**
  * The MIT License (MIT)
@@ -32,17 +35,24 @@ import java.text.SimpleDateFormat;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@Component
-public class Scheduler {
-    @Autowired
+public class TestScheduler {
+    @Mock
     TaskRepo repo;
 
-    Logger LOG = LoggerFactory.getLogger(Scheduler.class);
+    @InjectMocks
+    Scheduler scheduler;
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+    }
 
-    @Scheduled(fixedRate = 5000)
-    public void processTasks() {
-       LOG.info("There are {} tasks waiting", repo.findTasksToBeRun().size());
+    @Test
+    public void test_happy_days() {
+        when(repo.findTasksToBeRun()).thenReturn(Collections.<Task>emptyList());
+
+        scheduler.processTasks();
+
+        verify(repo, times(1)).findTasksToBeRun();
     }
 }
