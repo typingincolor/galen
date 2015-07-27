@@ -1,5 +1,6 @@
 package info.losd.galen.scheduler;
 
+import info.losd.galen.scheduler.entity.Header;
 import info.losd.galen.scheduler.entity.Task;
 import info.losd.galen.scheduler.repository.TaskRepo;
 import org.junit.Before;
@@ -8,7 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Collections;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 import static org.mockito.Mockito.*;
 
@@ -42,17 +46,35 @@ public class TestScheduler {
     @InjectMocks
     Scheduler scheduler;
 
+    Random random = new Random();
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void test_happy_days() {
-        when(repo.findTasksToBeRun()).thenReturn(Collections.<Task>emptyList());
+    public void test_it_processes_outstanding_tasks() {
+        List<Task> tasks = Arrays.asList(createTask(), createTask(), createTask());
+
+        when(repo.findTasksToBeRun()).thenReturn(tasks);
 
         scheduler.processTasks();
-
         verify(repo, times(1)).findTasksToBeRun();
+        verify(repo, times(3)).save(any(Task.class));
+    }
+
+    private Task createTask() {
+        List<Header> headers = Arrays.asList(new Header(r(10), r(10)), new Header(r(10), r(10)));
+        return new Task(r(10), 10, Instant.now(), "http://" + r(10) + ".com", "GET", headers);
+    }
+
+    private String r(int length){
+        return random.ints(48,122)
+                .filter(i-> (i<57 || i>65) && (i <90 || i>97))
+                .mapToObj(i -> (char) i)
+                .limit(length)
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+                .toString();
     }
 }

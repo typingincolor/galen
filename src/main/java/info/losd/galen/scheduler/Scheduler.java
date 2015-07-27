@@ -1,5 +1,6 @@
 package info.losd.galen.scheduler;
 
+import info.losd.galen.scheduler.entity.Task;
 import info.losd.galen.scheduler.repository.TaskRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.List;
 
 /**
  * The MIT License (MIT)
@@ -39,10 +41,16 @@ public class Scheduler {
 
     Logger LOG = LoggerFactory.getLogger(Scheduler.class);
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-
     @Scheduled(fixedRate = 5000)
     public void processTasks() {
-       LOG.info("There are {} tasks waiting", repo.findTasksToBeRun().size());
+        List<Task> tasks = repo.findTasksToBeRun();
+        LOG.info("There are {} tasks waiting", tasks.size());
+
+        tasks.forEach(task -> {
+            LOG.info("processing: {}", task.toString());
+            task.setLastUpdated(Instant.now());
+            repo.save(task);
+            LOG.info("processed:  {}", task.toString());
+        });
     }
 }

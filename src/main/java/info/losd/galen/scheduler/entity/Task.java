@@ -121,7 +121,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return String.format("Task[id = %d, name = '%s', period = %d, lastUpdated = '%s']",
-                id, name, period, lastUpdated.toString());
+        return String.format("Task[id = %d, name = '%s', url = '%s', method = '%s', period = %d, lastUpdated = '%s']",
+                id, name, url, method, period, lastUpdated.toString());
     }
 }
