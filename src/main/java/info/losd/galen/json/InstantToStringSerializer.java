@@ -1,12 +1,12 @@
-package info.losd.galen.configuration;
+package info.losd.galen.json;
 
-import org.influxdb.InfluxDB;
-import org.influxdb.InfluxDBFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+
+import java.io.IOException;
+import java.time.Instant;
 
 /**
  * The MIT License (MIT)
@@ -31,20 +31,14 @@ import org.springframework.context.annotation.Configuration;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@Configuration
-public class InfluxDbConfiguration {
-    @Autowired
-    InfluxDbSettings settings;
-
-    Logger logger = LoggerFactory.getLogger(InfluxDbConfiguration.class);
-
-    @Bean
-    InfluxDB influxDB() throws Exception {
-        logger.info("url: {}, database: {}", settings.getUrl(), settings.getName());
-
-        InfluxDB db = InfluxDBFactory.connect(settings.getUrl(),
-                settings.getUsername(),
-                settings.getPassword());
-        return db;
+public class InstantToStringSerializer extends JsonSerializer<Instant> {
+    @Override
+    public void serialize(Instant value,
+                          JsonGenerator jgen,
+                          SerializerProvider provider) throws
+            IOException,
+            JsonProcessingException
+    {
+        jgen.writeObject(value.toString());
     }
 }

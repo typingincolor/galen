@@ -1,11 +1,14 @@
-package info.losd.galen.api.dto;
+package info.losd.galen.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import info.losd.galen.json.InstantToStringSerializer;
 import info.losd.galen.json.StringToInstantDeserializer;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.time.Instant;
 
 /**
@@ -31,38 +34,63 @@ import java.time.Instant;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@SuppressWarnings("all")
-public class HealthcheckStatistic {
+@Entity
+public class Task {
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private long id;
+
     @JsonSerialize(using = InstantToStringSerializer.class)
     @JsonDeserialize(using = StringToInstantDeserializer.class)
-    private Instant timestamp = null;
+    private Instant lastUpdated;
+    private int period;
+    private String name;
 
-    @JsonProperty("response_time") private long responseTime = 0;
-
-    @JsonProperty("status_code") private long statusCode = 0;
-
-    public HealthcheckStatistic(Instant timestamp,
-                                long responseTime,
-                                long statusCode)
-    {
-        this.timestamp = timestamp;
-        this.responseTime = responseTime;
-        this.statusCode = statusCode;
-    }
-
-    public HealthcheckStatistic() {
+    public Task() {
 
     }
 
-    public Instant getTimestamp() {
-        return timestamp;
+    public Task(String name, int period, Instant lastUpdated) {
+        this.name = name;
+        this.period = period;
+        this.lastUpdated = lastUpdated;
     }
 
-    public long getResponseTime() {
-        return responseTime;
+    public long getId() {
+        return id;
     }
 
-    public long getStatusCode() {
-        return statusCode;
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public Instant getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Instant lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public int getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(int period) {
+        this.period = period;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Task[id = %d, name = '%s', period = %d, lastUpdated = '%s']",
+                id, name, period, lastUpdated.toString());
     }
 }

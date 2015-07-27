@@ -1,4 +1,4 @@
-package info.losd.galen.api.dto;
+package info.losd.galen.json;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

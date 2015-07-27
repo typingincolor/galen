@@ -1,11 +1,19 @@
-package info.losd.galen.api.dto;
+package info.losd.galen.respository;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import info.losd.galen.Galen;
+import info.losd.galen.IntegrationTest;
+import info.losd.galen.repository.TaskRepo;
+import info.losd.galen.repository.entity.Task;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.IOException;
 import java.time.Instant;
 
 /**
@@ -31,14 +39,21 @@ import java.time.Instant;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class InstantToStringSerializer extends JsonSerializer<Instant> {
-    @Override
-    public void serialize(Instant value,
-                          JsonGenerator jgen,
-                          SerializerProvider provider) throws
-            IOException,
-            JsonProcessingException
-    {
-        jgen.writeObject(value.toString());
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {Galen.class})
+@Category(IntegrationTest.class)
+@TestPropertySource("/test.properties")
+public class TestTaskRepo {
+    @Autowired
+    TaskRepo repo;
+
+    Logger LOG = LoggerFactory.getLogger(TestTaskRepo.class);
+
+    @Test
+    public void test_it_can_save_a_task() {
+        Task task = repo.save(new Task("test_task", 10, Instant.now()));
+
+        Task createdTask = repo.findOne(task.getId());
+        LOG.info(createdTask.toString());
     }
 }
