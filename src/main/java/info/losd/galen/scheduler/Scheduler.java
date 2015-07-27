@@ -1,7 +1,14 @@
 package info.losd.galen.scheduler;
 
+import com.google.gson.Gson;
+import info.losd.galen.api.dto.HealthcheckRequest;
+import info.losd.galen.repository.dto.Healthcheck;
 import info.losd.galen.scheduler.entity.Task;
 import info.losd.galen.scheduler.repository.TaskRepo;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +16,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The MIT License (MIT)
@@ -48,9 +57,38 @@ public class Scheduler {
 
         tasks.forEach(task -> {
             LOG.info("processing: {}", task.toString());
-            task.setLastUpdated(Instant.now());
-            repo.save(task);
-            LOG.info("processed:  {}", task.toString());
+
+            Map<String, String> headers = new HashMap<>();
+            task.getHeaders().forEach(header -> {
+                headers.put(header.getHeader(), header.getValue());
+            });
+
+            HealthcheckRequest healthcheckRequest = new HealthcheckRequest();
+            healthcheckRequest.setHeaders(headers);
+            healthcheckRequest.setMethod(task.getMethod());
+            healthcheckRequest.setTag(new Healthcheck(task.getName()));
+            healthcheckRequest.setUrl(task.getUrl());
+
+            String body = new Gson().toJson(healthcheckRequest, HealthcheckRequest.class);
+
+            try {
+                HttpResponse response = Request.Post("http://localhost:8080/healthchecks")
+                        .bodyString(body, ContentType.APPLICATION_JSON)
+                        .execute()
+                        .returnResponse();
+
+                StatusLine status = response.getStatusLine();
+                if (status.getStatusCode() == 200) {
+                    task.setLastUpdated(Instant.now());
+                    repo.save(task);
+                    LOG.info("processed:  {}", task.toString());
+                }
+                else {
+                    LOG.error("status code: {}, reason: {}", status.getStatusCode(), status.getReasonPhrase());
+                }
+            } catch (Exception e) {
+                LOG.error("Problem processing task {}", task.toString(), e);
+            }
         });
     }
 }

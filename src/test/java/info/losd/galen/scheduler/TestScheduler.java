@@ -1,9 +1,12 @@
 package info.losd.galen.scheduler;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import info.losd.galen.scheduler.entity.Header;
 import info.losd.galen.scheduler.entity.Task;
 import info.losd.galen.scheduler.repository.TaskRepo;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -40,6 +44,10 @@ import static org.mockito.Mockito.*;
  * THE SOFTWARE.
  */
 public class TestScheduler {
+    @Rule
+    @SuppressFBWarnings(value = {"URF_UNREAD_FIELD", "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"}, justification = "Wiremock uses it")
+    public WireMockRule wireMockRule = new WireMockRule();
+
     @Mock
     TaskRepo repo;
 
@@ -55,6 +63,9 @@ public class TestScheduler {
 
     @Test
     public void test_it_processes_outstanding_tasks() {
+        stubFor(post(urlEqualTo("/healthchecks"))
+                .willReturn(aResponse().withBody("OK")));
+
         List<Task> tasks = Arrays.asList(createTask(), createTask(), createTask());
 
         when(repo.findTasksToBeRun()).thenReturn(tasks);
