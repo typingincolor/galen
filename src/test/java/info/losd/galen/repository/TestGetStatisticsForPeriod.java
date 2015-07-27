@@ -1,6 +1,5 @@
-package info.losd.galen.respository;
+package info.losd.galen.repository;
 
-import info.losd.galen.repository.Period;
 import info.losd.galen.repository.dto.HealthcheckStatistic;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.influxdb.dto.Query;

@@ -1,4 +1,4 @@
-package info.losd.galen.respository;
+package info.losd.galen.repository;
 
 import info.losd.galen.repository.dto.HealthcheckDetails;
 import org.influxdb.dto.Point;

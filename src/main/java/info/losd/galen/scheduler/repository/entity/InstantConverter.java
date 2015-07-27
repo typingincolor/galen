@@ -1,10 +1,9 @@
-package info.losd.galen.scheduler.repository;
+package info.losd.galen.scheduler.repository.entity;
 
-import info.losd.galen.scheduler.repository.entity.Task;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-
-import java.util.List;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
+import java.time.Instant;
+import java.util.Date;
 
 /**
  * The MIT License (MIT)
@@ -29,8 +28,15 @@ import java.util.List;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public interface TaskRepo extends CrudRepository<Task, Long> {
+@Converter(autoApply = true)
+public class InstantConverter implements AttributeConverter<Instant, Date> {
+    @Override
+    public Date convertToDatabaseColumn(Instant instant) {
+        return Date.from(instant);
+    }
 
-    @Query(value = "select * from task where CURRENT_TIMESTAMP() > TIMESTAMPADD('SECOND', period, last_updated)", nativeQuery = true)
-    List<Task> findTasksToBeRun();
+    @Override
+    public Instant convertToEntityAttribute(Date value) {
+        return value.toInstant();
+    }
 }

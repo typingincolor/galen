@@ -1,7 +1,6 @@
-package info.losd.galen.respository;
+package info.losd.galen.repository;
 
 import info.losd.galen.configuration.InfluxDbName;
-import info.losd.galen.repository.InfluxdbHealthcheckRepo;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.QueryResult;
 import org.junit.Before;

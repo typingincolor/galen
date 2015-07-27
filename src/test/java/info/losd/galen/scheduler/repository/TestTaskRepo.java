@@ -1,10 +1,10 @@
 package info.losd.galen.scheduler.repository;
 
 import info.losd.galen.Galen;
-import info.losd.galen.IntegrationTest;
 import info.losd.galen.scheduler.repository.entity.Task;
+import org.hamcrest.collection.IsCollectionWithSize;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +14,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.Instant;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * The MIT License (MIT)
@@ -40,7 +43,6 @@ import java.time.Instant;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {Galen.class})
-@Category(IntegrationTest.class)
 @TestPropertySource("/test.properties")
 public class TestTaskRepo {
     @Autowired
@@ -48,11 +50,21 @@ public class TestTaskRepo {
 
     Logger LOG = LoggerFactory.getLogger(TestTaskRepo.class);
 
-    @Test
-    public void test_it_can_save_a_task() {
-        Task task = repo.save(new Task("test_task", 10, Instant.now()));
+    @Before
+    public void setup() {
+        repo.deleteAll();
+    }
 
-        Task createdTask = repo.findOne(task.getId());
-        LOG.info(createdTask.toString());
+    @Test
+    public void test_it_can_get_a_list_of_tasks_to_be_run() {
+        repo.save(new Task("test_task", 10, Instant.now().minusSeconds(10)));
+        repo.save(new Task("test_task", 10, Instant.now().minusSeconds(10)));
+        repo.save(new Task("test_task", 10, Instant.now().minusSeconds(10)));
+        repo.save(new Task("test_task", 10, Instant.now().plusSeconds(11)));
+        repo.save(new Task("test_task", 10, Instant.now().plusSeconds(12)));
+
+        List<Task> result = repo.findTasksToBeRun();
+
+        assertThat(result, IsCollectionWithSize.hasSize(3));
     }
 }

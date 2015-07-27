@@ -1,6 +1,5 @@
-package info.losd.galen.respository;
+package info.losd.galen.repository;
 
-import info.losd.galen.repository.Period;
 import info.losd.galen.repository.dto.HealthcheckMean;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
