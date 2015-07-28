@@ -6,6 +6,7 @@ import info.losd.galen.scheduler.entity.Header;
 import info.losd.galen.scheduler.entity.Task;
 import info.losd.galen.scheduler.repository.TaskRepo;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -44,9 +45,9 @@ import static org.mockito.Mockito.*;
  * THE SOFTWARE.
  */
 public class TestScheduler {
-    @Rule
+    @ClassRule
     @SuppressFBWarnings(value = {"URF_UNREAD_FIELD", "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"}, justification = "Wiremock uses it")
-    public WireMockRule wireMockRule = new WireMockRule();
+    public static WireMockRule wireMockRule = new WireMockRule();
 
     @Mock
     TaskRepo repo;

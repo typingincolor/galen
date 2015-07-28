@@ -12,14 +12,18 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.5.RELEASE")
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:1.2.5.RELEASE')
+        classpath('se.transmode.gradle:gradle-docker:1.2')
     }
 }
+
+group = 'typingincolor'
 
 apply plugin: 'spring-boot'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'findbugs'
+apply plugin: 'docker'
 
 jar {
     baseName = 'galen'
@@ -81,4 +85,16 @@ integrationTest {
     useJUnit {
         includeCategories 'info.losd.galen.IntegrationTest'
     }
+}
+
+task buildDocker(type: Docker, dependsOn: build) {
+  push = true
+  applicationName = jar.baseName
+  dockerfile = file('src/main/docker/Dockerfile')
+  doFirst {
+    copy {
+      from jar
+      into stageDir
+    }
+  }
 }

@@ -72,7 +72,7 @@ public class Scheduler {
             String body = new Gson().toJson(healthcheckRequest, HealthcheckRequest.class);
 
             try {
-                HttpResponse response = Request.Post("http://localhost:8080/healthchecks")
+                HttpResponse response = Request.Post("http://127.0.0.1:8080/healthchecks")
                         .bodyString(body, ContentType.APPLICATION_JSON)
                         .execute()
                         .returnResponse();
