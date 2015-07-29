@@ -58,7 +58,7 @@ public class Scheduler {
         LOG.info("There are {} tasks waiting", tasks.size());
 
         tasks.forEach(task -> {
-            LOG.info("processing: {}", task.toString());
+            LOG.debug("processing: {}", task.toString());
 
             Map<String, String> headers = new HashMap<>();
             task.getHeaders().forEach(header -> {
@@ -74,8 +74,6 @@ public class Scheduler {
             try {
                 String body = mapper.writeValueAsString(healthcheckRequest);
 
-                LOG.info(body);
-
                 HttpResponse response = Request.Post("http://127.0.0.1:8080/healthchecks")
                         .bodyString(body, ContentType.APPLICATION_JSON)
                         .execute()
@@ -85,14 +83,17 @@ public class Scheduler {
                 if (status.getStatusCode() == 200) {
                     task.setLastUpdated(Instant.now());
                     repo.save(task);
-                    LOG.info("processed:  {}", task.toString());
+                    LOG.debug("processed:  {}", task.getId());
                 }
                 else {
-                    LOG.error("status code: {}, reason: {}", status.getStatusCode(), status.getReasonPhrase());
-                    LOG.error(IOUtils.toString(response.getEntity().getContent()));
+                    LOG.error("task: {}, status code: {}, reason: {}\nbody: {}",
+                            task.getId(),
+                            status.getStatusCode(),
+                            status.getReasonPhrase(),
+                            IOUtils.toString(response.getEntity().getContent()));
                 }
             } catch (Exception e) {
-                LOG.error("Problem processing task {}", task.toString(), e);
+                LOG.error("Problem processing task {}", task.getId(), e);
             }
         });
     }

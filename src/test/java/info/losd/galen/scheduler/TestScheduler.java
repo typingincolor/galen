@@ -7,7 +7,6 @@ import info.losd.galen.scheduler.entity.Task;
 import info.losd.galen.scheduler.repository.TaskRepo;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -19,7 +18,9 @@ import java.util.List;
 import java.util.Random;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 /**
  * The MIT License (MIT)
@@ -65,6 +66,10 @@ public class TestScheduler {
     @Test
     public void test_it_processes_outstanding_tasks() {
         stubFor(post(urlEqualTo("/healthchecks"))
+                .withRequestBody(matchingJsonPath("$.tag"))
+                .withRequestBody(matchingJsonPath("$.url"))
+                .withRequestBody(matchingJsonPath("$.method"))
+                .withRequestBody(matchingJsonPath("$.headers"))
                 .willReturn(aResponse().withBody("OK")));
 
         List<Task> tasks = Arrays.asList(createTask(), createTask(), createTask());
