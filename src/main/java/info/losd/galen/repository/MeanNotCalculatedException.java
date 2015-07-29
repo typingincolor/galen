@@ -23,7 +23,7 @@ package info.losd.galen.repository;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class MeanNotCalculatedException extends Exception {
+public class MeanNotCalculatedException extends RuntimeException {
     public MeanNotCalculatedException(Exception e) {
         super(e);
     }

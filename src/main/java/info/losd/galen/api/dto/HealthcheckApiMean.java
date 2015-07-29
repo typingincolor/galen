@@ -1,5 +1,12 @@
 package info.losd.galen.api.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import info.losd.galen.json.InstantToStringSerializer;
+import info.losd.galen.json.StringToInstantDeserializer;
+
+import java.time.Instant;
+
 /**
  * The MIT License (MIT)
  * <p>
@@ -23,30 +30,27 @@ package info.losd.galen.api.dto;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class HealthcheckResult {
-    private int statusCode;
+public class HealthcheckApiMean {
+    @JsonSerialize(using = InstantToStringSerializer.class)
+    @JsonDeserialize(using = StringToInstantDeserializer.class)
+    private Instant timestamp;
 
-    public int getStatusCode() {
-        return statusCode;
+    private double mean;
+
+    public HealthcheckApiMean() {
+
     }
 
-    private HealthcheckResult(int statusCode) {
-        this.statusCode = statusCode;
+    public HealthcheckApiMean(Instant timestamp, double mean) {
+        this.timestamp = timestamp;
+        this.mean = mean;
     }
 
-    public static HealthcheckResult.Builder statusCode(int statusCode) {
-        return new HealthcheckResult.Builder(statusCode);
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
-    public static class Builder {
-        int statusCode;
-
-        private Builder(int statusCode) {
-            this.statusCode = statusCode;
-        }
-
-        public HealthcheckResult build() {
-            return new HealthcheckResult(statusCode);
-        }
+    public double getMean() {
+        return mean;
     }
 }

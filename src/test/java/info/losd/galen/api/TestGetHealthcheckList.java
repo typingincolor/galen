@@ -1,6 +1,7 @@
 package info.losd.galen.api;
 
 import com.google.gson.reflect.TypeToken;
+import info.losd.galen.api.dto.HealthcheckApiDTO;
 import info.losd.galen.repository.dto.Healthcheck;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Test;
@@ -57,10 +58,10 @@ public class TestGetHealthcheckList extends GalenApiControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        Type type = new TypeToken<List<info.losd.galen.api.dto.Healthcheck>>() {
+        Type type = new TypeToken<List<HealthcheckApiDTO>>() {
         }.getType();
 
-        List<info.losd.galen.api.dto.Healthcheck> result = gson.fromJson(mvcResult.getResponse().getContentAsString(), type);
+        List<HealthcheckApiDTO> result = gson.fromJson(mvcResult.getResponse().getContentAsString(), type);
 
         assertThat(result, is(IsCollectionWithSize.hasSize(3)));
         assertThat(result.get(0).getName(), is(equalTo("healthcheck1")));

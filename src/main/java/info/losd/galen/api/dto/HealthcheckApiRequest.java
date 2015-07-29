@@ -27,7 +27,7 @@ import java.util.Map;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class HealthcheckRequest {
+public class HealthcheckApiRequest {
     private Healthcheck tag;
     private String url;
     private Map<String, String> headers;

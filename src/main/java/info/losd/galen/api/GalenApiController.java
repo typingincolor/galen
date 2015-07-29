@@ -1,15 +1,13 @@
 package info.losd.galen.api;
 
-import info.losd.galen.api.dto.Healthcheck;
-import info.losd.galen.api.dto.HealthcheckRequest;
-import info.losd.galen.api.dto.HealthcheckResult;
-import info.losd.galen.api.dto.HealthcheckStatistic;
+import info.losd.galen.api.dto.*;
 import info.losd.galen.client.ApiClient;
 import info.losd.galen.client.ApiMethod;
 import info.losd.galen.client.dto.ApiRequest;
 import info.losd.galen.client.dto.ApiResponse;
 import info.losd.galen.repository.HealthcheckRepo;
 import info.losd.galen.repository.Period;
+import info.losd.galen.repository.dto.HealthcheckMean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -55,69 +53,69 @@ public class GalenApiController {
 
     @RequestMapping(value = "/healthchecks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public HttpEntity<HealthcheckResult> run(@RequestBody HealthcheckRequest galen) {
+    public HttpEntity<HealthcheckApiResult> run(@RequestBody HealthcheckApiRequest galen) {
         ApiRequest.Header apiRequestBuilder = ApiRequest.tag(galen.getTag().getName()).url(galen.getUrl()).method(ApiMethod.valueOf(galen.getMethod()));
         galen.getHeaders().forEach((header, value) -> apiRequestBuilder.header(header, value));
         ApiResponse response = client.execute(apiRequestBuilder.build());
 
-        return new ResponseEntity<>(HealthcheckResult.statusCode(response.getStatusCode()).build(), HttpStatus.OK);
+        return new ResponseEntity<>(HealthcheckApiResult.statusCode(response.getStatusCode()).build(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/healthchecks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public HttpEntity<List<Healthcheck>> getHealthcheckList() {
-        List<Healthcheck> result = new LinkedList<>();
+    public HttpEntity<List<HealthcheckApiDTO>> getHealthcheckList() {
+        List<HealthcheckApiDTO> result = new LinkedList<>();
 
         repo.getHealthchecks().forEach(healthcheck -> {
-            result.add(new Healthcheck(healthcheck.getName()));
+            result.add(new HealthcheckApiDTO(healthcheck.getName()));
         });
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/healthchecks/{name}", method = RequestMethod.GET,
-                    produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public HttpEntity<Healthcheck> getHealtcheck(@PathVariable String name) {
-        return new ResponseEntity<>(new Healthcheck(name), HttpStatus.OK);
+    public HttpEntity<HealthcheckApiDTO> getHealtcheck(@PathVariable String name) {
+        return new ResponseEntity<>(new HealthcheckApiDTO(name), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/healthchecks/{name}/statistics", method = RequestMethod.GET,
-                    produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public HttpEntity<List<HealthcheckStatistic>> getStatistics(@PathVariable String name,
-                                                                @RequestParam(value = "period",
-                                                                              required = false,
-                                                                              defaultValue = "2m") String period)
-    {
-        List<HealthcheckStatistic> result = new LinkedList<>();
+    public HttpEntity<List<HealthcheckApiStatistic>> getStatistics(@PathVariable String name,
+                                                                   @RequestParam(value = "period",
+                                                                           required = false,
+                                                                           defaultValue = "2m") String period) {
+        List<HealthcheckApiStatistic> result = new LinkedList<>();
         Period p = Period.getPeriod(period);
         List<info.losd.galen.repository.dto.HealthcheckStatistic> stats =
                 repo.getStatisticsForPeriod(name, p);
 
         stats.forEach(stat -> {
-            result.add(new HealthcheckStatistic(stat.getTimestamp(), stat.getResponseTime(), stat.getStatusCode()));
+            result.add(new HealthcheckApiStatistic(stat.getTimestamp(), stat.getResponseTime(), stat.getStatusCode()));
         });
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/healthchecks/{name}/statistics/mean", method = RequestMethod.GET,
-                    produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public HttpEntity<String> getMean(@PathVariable String name,
-                                      @RequestParam(value = "period",
-                                                    required = false,
-                                                    defaultValue = "2m") String period)
-    {
-        return new ResponseEntity<>("boom", HttpStatus.OK);
+    public HttpEntity<HealthcheckApiMean> getMean(@PathVariable String name,
+                                                  @RequestParam(value = "period",
+                                                          required = false,
+                                                          defaultValue = "2m") String period) {
+        Period p = Period.getPeriod(period);
+
+        HealthcheckMean result = repo.getMeanForPeriod(name, p);
+        return new ResponseEntity<>(new HealthcheckApiMean(result.getTimestamp(), result.getMean()), HttpStatus.OK);
     }
 
 
     @ExceptionHandler(IllegalArgumentException.class)
     void illegalArgumentException(HttpServletResponse response) throws
-            IOException
-    {
+            IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.sendError(HttpStatus.BAD_REQUEST.value(), "The method specified is invalid");
     }

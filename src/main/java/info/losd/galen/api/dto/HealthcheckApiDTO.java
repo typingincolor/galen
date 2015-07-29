@@ -3,7 +3,6 @@ package info.losd.galen.api.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import info.losd.galen.api.GalenApiController;
-import info.losd.galen.repository.Period;
 import org.springframework.hateoas.ResourceSupport;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -32,11 +31,11 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class Healthcheck extends ResourceSupport {
+public class HealthcheckApiDTO extends ResourceSupport {
     private String name;
 
     @JsonCreator
-    public Healthcheck(@JsonProperty("name") String name) {
+    public HealthcheckApiDTO(@JsonProperty("name") String name) {
         this.name = name;
         this.add(linkTo(methodOn(GalenApiController.class).getHealtcheck(name)).withSelfRel());
         this.add(linkTo(methodOn(GalenApiController.class).getStatistics(name, "2m")).withRel("statistics"));
@@ -53,7 +52,7 @@ public class Healthcheck extends ResourceSupport {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        Healthcheck that = (Healthcheck) o;
+        HealthcheckApiDTO that = (HealthcheckApiDTO) o;
 
         return !(name != null ? !name.equals(that.name) : that.name != null);
 

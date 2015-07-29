@@ -1,6 +1,6 @@
 package info.losd.galen.api;
 
-import info.losd.galen.api.dto.HealthcheckResult;
+import info.losd.galen.api.dto.HealthcheckApiResult;
 import info.losd.galen.client.ApiMethod;
 import info.losd.galen.client.dto.ApiRequest;
 import info.losd.galen.client.dto.ApiResponse;
@@ -56,7 +56,7 @@ public class TestPostHealthCheckRequest extends GalenApiControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        HealthcheckResult result = gson.fromJson(mvcResult.getResponse().getContentAsString(), HealthcheckResult.class);
+        HealthcheckApiResult result = gson.fromJson(mvcResult.getResponse().getContentAsString(), HealthcheckApiResult.class);
         assertThat(result.getStatusCode(), is(200));
 
         ApiRequest captured = argumentCaptor.getValue();

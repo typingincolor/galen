@@ -1,13 +1,5 @@
 package info.losd.galen.api.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import info.losd.galen.json.InstantToStringSerializer;
-import info.losd.galen.json.StringToInstantDeserializer;
-
-import java.time.Instant;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -31,38 +23,30 @@ import java.time.Instant;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@SuppressWarnings("all")
-public class HealthcheckStatistic {
-    @JsonSerialize(using = InstantToStringSerializer.class)
-    @JsonDeserialize(using = StringToInstantDeserializer.class)
-    private Instant timestamp = null;
+public class HealthcheckApiResult {
+    private int statusCode;
 
-    @JsonProperty("response_time") private long responseTime = 0;
+    public int getStatusCode() {
+        return statusCode;
+    }
 
-    @JsonProperty("status_code") private long statusCode = 0;
-
-    public HealthcheckStatistic(Instant timestamp,
-                                long responseTime,
-                                long statusCode)
-    {
-        this.timestamp = timestamp;
-        this.responseTime = responseTime;
+    private HealthcheckApiResult(int statusCode) {
         this.statusCode = statusCode;
     }
 
-    public HealthcheckStatistic() {
-
+    public static HealthcheckApiResult.Builder statusCode(int statusCode) {
+        return new HealthcheckApiResult.Builder(statusCode);
     }
 
-    public Instant getTimestamp() {
-        return timestamp;
-    }
+    public static class Builder {
+        int statusCode;
 
-    public long getResponseTime() {
-        return responseTime;
-    }
+        private Builder(int statusCode) {
+            this.statusCode = statusCode;
+        }
 
-    public long getStatusCode() {
-        return statusCode;
+        public HealthcheckApiResult build() {
+            return new HealthcheckApiResult(statusCode);
+        }
     }
 }

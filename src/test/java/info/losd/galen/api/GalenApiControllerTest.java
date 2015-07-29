@@ -2,7 +2,7 @@ package info.losd.galen.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import info.losd.galen.api.dto.Healthcheck;
+import info.losd.galen.api.dto.HealthcheckApiDTO;
 import info.losd.galen.client.ApiClient;
 import info.losd.galen.repository.HealthcheckRepo;
 import org.junit.Before;
@@ -62,7 +62,7 @@ abstract public class GalenApiControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(apiController).setViewResolvers(viewResolver).build();
     }
 
-    void checkHealthcheck(Healthcheck healthcheck, String text) {
+    void checkHealthcheck(HealthcheckApiDTO healthcheck, String text) {
         assertThat(healthcheck.getLink("self").toString(), is(equalTo("<http://localhost/healthchecks/" + text + ">;rel=\"self\"")));
         assertThat(healthcheck.getLink("statistics").toString(), is(equalTo("<http://localhost/healthchecks/" + text + "/statistics?period=2m>;rel=\"statistics\"")));
         assertThat(healthcheck.getLink("mean").toString(), is(equalTo("<http://localhost/healthchecks/" + text + "/statistics/mean?period=2m>;rel=\"mean\"")));

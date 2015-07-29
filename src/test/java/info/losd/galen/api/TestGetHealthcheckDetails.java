@@ -1,6 +1,6 @@
 package info.losd.galen.api;
 
-import info.losd.galen.api.dto.Healthcheck;
+import info.losd.galen.api.dto.HealthcheckApiDTO;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -40,7 +40,7 @@ public class TestGetHealthcheckDetails extends GalenApiControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        Healthcheck result = gson.fromJson(mvcResult.getResponse().getContentAsString(), Healthcheck.class);
+        HealthcheckApiDTO result = gson.fromJson(mvcResult.getResponse().getContentAsString(), HealthcheckApiDTO.class);
 
         checkHealthcheck(result, "healthcheck1");
     }

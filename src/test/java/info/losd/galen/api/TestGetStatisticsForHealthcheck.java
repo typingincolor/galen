@@ -2,12 +2,12 @@ package info.losd.galen.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import info.losd.galen.api.dto.HealthcheckApiStatistic;
 import info.losd.galen.repository.Period;
 import info.losd.galen.repository.dto.HealthcheckStatistic;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -22,6 +22,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.mockito.Matchers.eq;
 
 public class TestGetStatisticsForHealthcheck extends GalenApiControllerTest{
     @Test
@@ -31,7 +32,7 @@ public class TestGetStatisticsForHealthcheck extends GalenApiControllerTest{
                 new HealthcheckStatistic("2015-07-13T07:51:25.166Z", 102L, 200L),
                 new HealthcheckStatistic("2015-07-13T07:51:25.167Z", 103L, 200L)
         ));
-        Mockito.when(repo.getStatisticsForPeriod(Matchers.anyString(), Matchers.any(Period.class))).thenReturn(list);
+        Mockito.when(repo.getStatisticsForPeriod(eq("healthcheck1"), eq(Period.TWO_MINUTES))).thenReturn(list);
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/healthchecks/healthcheck1/statistics?period=2m"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -40,8 +41,8 @@ public class TestGetStatisticsForHealthcheck extends GalenApiControllerTest{
 
         ObjectMapper mapper = new ObjectMapper();
         String contentAsString = mvcResult.getResponse().getContentAsString();
-        List<info.losd.galen.api.dto.HealthcheckStatistic> result =
-                mapper.readValue(contentAsString, new TypeReference<List<info.losd.galen.api.dto.HealthcheckStatistic>>() {
+        List<HealthcheckApiStatistic> result =
+                mapper.readValue(contentAsString, new TypeReference<List<HealthcheckApiStatistic>>() {
                 });
 
         MatcherAssert.assertThat(result, IsCollectionWithSize.hasSize(3));
@@ -51,7 +52,7 @@ public class TestGetStatisticsForHealthcheck extends GalenApiControllerTest{
         checkHealthCheckStatistic(result.get(2), "2015-07-13T07:51:25.167Z", 103L, 200L);
     }
 
-    private void checkHealthCheckStatistic(info.losd.galen.api.dto.HealthcheckStatistic healthcheckStatistic, String timestamp, long responseTime, long statusCode) {
+    private void checkHealthCheckStatistic(HealthcheckApiStatistic healthcheckStatistic, String timestamp, long responseTime, long statusCode) {
         assertThat(healthcheckStatistic.getTimestamp(), is(equalTo(Instant.parse(timestamp))));
         assertThat(healthcheckStatistic.getResponseTime(), is(equalTo(responseTime)));
         assertThat(healthcheckStatistic.getStatusCode(), is(equalTo(statusCode)));
