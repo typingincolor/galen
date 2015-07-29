@@ -103,6 +103,7 @@ task createDockerfile(type: Dockerfile) {
     volume '/tmp'
     addFile 'galen-0.1.0.jar', 'app.jar'
     runCommand "bash -c 'touch /app.jar'"
+    runCommand "mkdir /data"
     entryPoint 'java', '-Djava.security.egd=file:/dev/./urandom','-jar','/app.jar'
 }
 

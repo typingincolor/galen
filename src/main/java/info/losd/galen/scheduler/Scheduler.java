@@ -1,10 +1,10 @@
 package info.losd.galen.scheduler;
 
-import com.google.gson.Gson;
-import info.losd.galen.api.dto.HealthcheckRequest;
-import info.losd.galen.repository.dto.Healthcheck;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import info.losd.galen.scheduler.dto.SchedulerHealthcheck;
 import info.losd.galen.scheduler.entity.Task;
 import info.losd.galen.scheduler.repository.TaskRepo;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.fluent.Request;
@@ -50,6 +50,8 @@ public class Scheduler {
 
     Logger LOG = LoggerFactory.getLogger(Scheduler.class);
 
+    ObjectMapper mapper = new ObjectMapper();
+
     @Scheduled(fixedRate = 5000)
     public void processTasks() {
         List<Task> tasks = repo.findTasksToBeRun();
@@ -63,15 +65,17 @@ public class Scheduler {
                 headers.put(header.getHeader(), header.getValue());
             });
 
-            HealthcheckRequest healthcheckRequest = new HealthcheckRequest();
+            SchedulerHealthcheck healthcheckRequest = new SchedulerHealthcheck();
             healthcheckRequest.setHeaders(headers);
             healthcheckRequest.setMethod(task.getMethod());
-            healthcheckRequest.setTag(new Healthcheck(task.getName()));
+            healthcheckRequest.setTag(task.getName());
             healthcheckRequest.setUrl(task.getUrl());
 
-            String body = new Gson().toJson(healthcheckRequest, HealthcheckRequest.class);
-
             try {
+                String body = mapper.writeValueAsString(healthcheckRequest);
+
+                LOG.info(body);
+
                 HttpResponse response = Request.Post("http://127.0.0.1:8080/healthchecks")
                         .bodyString(body, ContentType.APPLICATION_JSON)
                         .execute()
@@ -85,6 +89,7 @@ public class Scheduler {
                 }
                 else {
                     LOG.error("status code: {}, reason: {}", status.getStatusCode(), status.getReasonPhrase());
+                    LOG.error(IOUtils.toString(response.getEntity().getContent()));
                 }
             } catch (Exception e) {
                 LOG.error("Problem processing task {}", task.toString(), e);
