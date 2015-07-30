@@ -7,10 +7,12 @@ machine:
     - docker
 test:
   pre:
-    - ./gradlew findbugsMain
-    - ./gradlew findbugsTest
+    - ./gradlew --quiet findbugsMain
+    - ./gradlew --quiet findbugsTest
+  override:
+    - ./gradlew --quiet test
   post:
-    - ./gradlew build
+    - ./gradlew --quiet build
 deployment:
   hub:
     branch: master
