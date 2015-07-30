@@ -7,11 +7,9 @@ machine:
     - docker
 test:
   pre:
-    commands:
-      - ./gradlew findbugs
+    - ./gradlew findbugs
   post:
-    commands:
-      - ./gradlew build
+    - ./gradlew build
 deployment:
   hub:
     branch: master
