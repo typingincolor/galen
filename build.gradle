@@ -57,13 +57,6 @@ dependencies {
     testCompile 'com.google.code.findbugs:annotations:3.0.0'
 }
 
-test {
-    reports {
-        junitXml.enabled = false
-        html.enabled = true
-    }
-}
-
 tasks.withType(FindBugs) {
     reports {
         xml.enabled = false
