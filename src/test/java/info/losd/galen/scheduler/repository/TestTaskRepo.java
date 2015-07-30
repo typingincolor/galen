@@ -6,10 +6,12 @@ import info.losd.galen.scheduler.entity.Task;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
@@ -57,6 +59,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @SpringApplicationConfiguration(classes = Galen.class)
 @TestPropertySource("/test.properties")
 @DirtiesContext
+@Category(IntegrationTest.class)
 public class TestTaskRepo {
     @Autowired
     TaskRepo repo;
