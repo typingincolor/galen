@@ -5,6 +5,13 @@ machine:
     version: oraclejdk8
   services:
     - docker
+test:
+  pre:
+    commands:
+      - ./gradlew findbugs
+  post:
+    commands:
+      - ./gradlew build
 deployment:
   hub:
     branch: master
