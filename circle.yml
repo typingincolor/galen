@@ -3,11 +3,10 @@ machine:
     Europe/London
   java:
     version: oraclejdk8
+  environment:
+    JAVA_OPTS: "-Xms2048m -Xmx2048m"
   services:
     - docker
-dependencies:
-  post:
-    - rm -r ~/.gradle
 test:
   pre:
     - ./gradlew --quiet findbugsMain
@@ -15,7 +14,10 @@ test:
   override:
     - ./gradlew --quiet test
   post:
-    - ./gradlew --quiet build
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+    - mkdir -p $CIRCLE_ARTIFACTS/findbugs
+    - find . -type f -regex ".*/build/reports/findbugs/.*html" -exec cp {} $CIRCLE_ARTIFACTS/findbugs/ \;
 deployment:
   hub:
     branch: master
