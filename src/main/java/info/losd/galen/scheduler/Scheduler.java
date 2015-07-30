@@ -52,10 +52,10 @@ public class Scheduler {
 
     ObjectMapper mapper = new ObjectMapper();
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedDelay = 500)
     public void processTasks() {
         List<Task> tasks = repo.findTasksToBeRun();
-        LOG.info("There are {} tasks waiting", tasks.size());
+        LOG.debug("There are {} tasks waiting", tasks.size());
 
         tasks.forEach(task -> {
             LOG.debug("processing: {}", task.toString());
