@@ -1,0 +1,14 @@
+machine:
+  timezone:
+    Europe/London
+  java:
+    version: oraclejdk8
+  services:
+    - docker
+  deployment:
+    hub:
+      branch: master
+      commands:
+        - ./gradlew buildImage
+        - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+        - docker push typingincolor/galen
