@@ -5,6 +5,9 @@ machine:
     version: oraclejdk8
   services:
     - docker
+dependencies:
+  post:
+    - rm -r ~/.gradle
 test:
   pre:
     - ./gradlew --quiet findbugsMain
