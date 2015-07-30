@@ -7,7 +7,8 @@ machine:
     - docker
 test:
   pre:
-    - ./gradlew findbugs
+    - ./gradlew findbugsMain
+    - ./gradlew findbugsTest
   post:
     - ./gradlew build
 deployment:
