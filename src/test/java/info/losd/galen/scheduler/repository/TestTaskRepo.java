@@ -10,10 +10,16 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -46,8 +52,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * THE SOFTWARE.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {Galen.class})
+@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
+                         TransactionalTestExecutionListener.class})
+@SpringApplicationConfiguration(classes = Galen.class)
 @TestPropertySource("/test.properties")
+@DirtiesContext
 public class TestTaskRepo {
     @Autowired
     TaskRepo repo;

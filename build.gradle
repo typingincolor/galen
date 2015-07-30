@@ -13,17 +13,13 @@ buildscript {
     }
     dependencies {
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.2.5.RELEASE'
-        classpath 'com.bmuschko:gradle-docker-plugin:2.5'
     }
 }
-
-group = 'typingincolor'
 
 apply plugin: 'spring-boot'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'findbugs'
-apply plugin: 'com.bmuschko.docker-remote-api'
 
 jar {
     baseName = 'galen'
@@ -79,36 +75,3 @@ integrationTest {
         includeCategories 'info.losd.galen.IntegrationTest'
     }
 }
-
-import com.bmuschko.gradle.docker.tasks.image.Dockerfile
-import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
-
-docker {
-    url = 'https://192.168.59.103:2376'
-    certPath = new File(System.properties['user.home'], '.boot2docker/certs/boot2docker-vm')
-}
-
-task createDockerfile(type: Dockerfile) {
-    destFile = project.file('build/docker/Dockerfile')
-
-    from 'java:8'
-    maintainer 'Andrew Braithwaite "andrew@losd.info"'
-    volume '/tmp'
-    addFile 'galen-0.1.0.jar', 'app.jar'
-    runCommand "bash -c 'touch /app.jar'"
-    runCommand "mkdir /data"
-    entryPoint 'java', '-Djava.security.egd=file:/dev/./urandom','-jar','/app.jar'
-}
-
-task buildImage(type: DockerBuildImage) {
-  dependsOn createDockerfile
-  inputDir = createDockerfile.destFile.parentFile
-  tag = 'typingincolor/galen'
-    doFirst {
-    copy {
-      from jar
-      into 'build/docker'
-    }
-  }
-}
-

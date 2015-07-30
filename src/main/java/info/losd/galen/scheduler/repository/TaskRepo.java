@@ -30,7 +30,6 @@ import java.util.List;
  * THE SOFTWARE.
  */
 public interface TaskRepo extends CrudRepository<Task, Long> {
-
     @Query(value = "select * from task where CURRENT_TIMESTAMP() > TIMESTAMPADD('SECOND', period, last_updated)", nativeQuery = true)
     List<Task> findTasksToBeRun();
 }
