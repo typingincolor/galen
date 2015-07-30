@@ -1,5 +1,6 @@
 package info.losd.galen.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -41,18 +42,16 @@ public class HealthcheckApiStatistic {
 
     @JsonProperty("status_code") private long statusCode = 0;
 
-    public HealthcheckApiStatistic(Instant timestamp,
-                                   long responseTime,
-                                   long statusCode)
+    @JsonCreator
+    public HealthcheckApiStatistic(@JsonProperty("timestamp") Instant timestamp,
+                                   @JsonProperty("response_time") long responseTime,
+                                   @JsonProperty("status_code") long statusCode)
     {
         this.timestamp = timestamp;
         this.responseTime = responseTime;
         this.statusCode = statusCode;
     }
 
-    public HealthcheckApiStatistic() {
-
-    }
 
     public Instant getTimestamp() {
         return timestamp;

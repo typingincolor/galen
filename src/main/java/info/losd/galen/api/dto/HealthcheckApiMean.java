@@ -1,5 +1,7 @@
 package info.losd.galen.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import info.losd.galen.json.InstantToStringSerializer;
@@ -37,11 +39,8 @@ public class HealthcheckApiMean {
 
     private double mean;
 
-    public HealthcheckApiMean() {
-
-    }
-
-    public HealthcheckApiMean(Instant timestamp, double mean) {
+    @JsonCreator
+    public HealthcheckApiMean(@JsonProperty("timestamp") Instant timestamp, @JsonProperty("mean") double mean) {
         this.timestamp = timestamp;
         this.mean = mean;
     }
