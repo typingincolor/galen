@@ -59,7 +59,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @SpringApplicationConfiguration(classes = Galen.class)
 @TestPropertySource("/test.properties")
 @DirtiesContext
-@Category(IntegrationTest.class)
 public class TestTaskRepo {
     @Autowired
     TaskRepo repo;
