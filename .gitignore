@@ -1,0 +1,10 @@
+.idea
+.gradle
+galen.iml
+build
+.env
+
+bin
+.classpath
+.settings
+.project
