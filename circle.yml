@@ -20,7 +20,7 @@ test:
     - find . -type f -regex ".*/build/reports/findbugs/.*html" -exec cp {} $CIRCLE_ARTIFACTS/findbugs/ \;
 deployment:
   hub:
-    branch: development
+    branch: master
     commands:
       - ./gradlew --quiet assemble
       - docker build -t typingincolor/galen .
